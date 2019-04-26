@@ -1,5 +1,5 @@
 pipeline {
-    agent { dockerfile true }
+    agent { dockerfile { filename '.jenkins/Dockerfile' } }
     stages {
         stage('Lint') {
             steps {
