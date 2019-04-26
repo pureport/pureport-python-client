@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from requests import Session, HTTPError
+from requests import Session
 
-from ..exception.api import ClientHttpException
+from ..exception.api import raise_response_exception
 
 __docformat__ = 'reStructuredText'
 
@@ -23,16 +23,13 @@ class RaiseForStatusSession(Session):
     def __init__(self, *args, **kwargs):
         """
         A :class:`requests.Session` subclass that always raises_for_status on each request
-        throwing an error.
+        throwing a :class:`..exception.api.ClientHttpException` if necessary.
         """
         super(RaiseForStatusSession, self).__init__()
 
     def request(self, method, url, **kwargs):
         response = super(RaiseForStatusSession, self).request(method, url, **kwargs)
-        try:
-            response.raise_for_status()
-        except HTTPError as e:
-            raise ClientHttpException(*e.args, status_code=e.response.status_code, response=e.response)
+        raise_response_exception(response)
         return response
 
 
