@@ -8,6 +8,16 @@ class MissingAccessTokenException(IOError):
     pass
 
 
+class ConnectionFailedToBecomeActiveException(IOError):
+    def __init__(self, *args, **kwargs):
+        """
+        An exception representing the connection failed to become active
+        :param Connection connection: the connection
+        """
+        self.connection = kwargs.pop('connection', None)
+        super(ConnectionFailedToBecomeActiveException, self).__init__(*args, **kwargs)
+
+
 class ClientHttpException(IOError):
     def __init__(self, *args, **kwargs):
         """

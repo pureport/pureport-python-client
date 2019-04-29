@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from ..exception.api import MissingAccessTokenException, ConnectionFailedToBecomeActiveException
 from ..util.api import RelativeRaiseForStatusSession
-from ..exception.api import MissingAccessTokenException
+from ..util.decorators import retry
 
 __docformat__ = 'reStructuredText'
 
@@ -940,14 +941,27 @@ class Client(object):
             """
             return self.__session.get('%s/connections' % self.__network['href']).json()
 
-        def create(self, connection):
+        def create(self, connection, wait_until_active=True):
             """
             Create a connection for the provided network.
             :param Connection connection: the connect object
+            :param bool wait_until_active: wait until the connection is active using a backoff retry
             :rtype: Connection
             :raises: .exception.HttpClientException
+            :raises: .exception.ConnectionFailedToBecomeActiveException
             """
-            return self.__session.post('%s/connections' % self.__network['href'], json=connection).json()
+            connection = self.__session.post('%s/connections' % self.__network['href'], json=connection).json()
+            if wait_until_active:
+                return self.__get_connection_until_active(connection)
+            else:
+                return connection
+
+        @retry(ConnectionFailedToBecomeActiveException)
+        def __get_connection_until_active(self, connection):
+            connection = self.__session.get(connection['href']).json()
+            if connection['state'] != 'ACTIVE':
+                raise ConnectionFailedToBecomeActiveException(connection=connection)
+            return connection
 
     class OptionsClient(object):
         def __init__(self, session):
