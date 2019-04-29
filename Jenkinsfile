@@ -43,11 +43,13 @@ pipeline {
                         passwordVariable: 'password'
                     )
                 ]) {
-                    sh """
-                        version=\$(python setup.py --version)
-                        git tag $version
-                        git push https://$username:$password@github.com/pureport/pureport-python-client $version
-                    """
+                    script {
+                        version = sh(returnStdout: true, script: "python setup.py --version").trim()
+                        sh """
+                            git tag $version
+                            git push https://$username:$password@github.com/pureport/pureport-python-client $version
+                        """
+                    }
                 }
             }
         }
