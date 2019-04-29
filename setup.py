@@ -6,7 +6,7 @@ setup(
     version='0.0.1',
     author='Pureport',
     author_email='noreply@pureport.com',
-    license='LICENSE',
+    license='MIT',
     description='An API client for the Pureport ReST API',
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
