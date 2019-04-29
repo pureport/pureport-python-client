@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..exception.api import MissingAccessTokenException, ConnectionFailedToBecomeActiveException
+from ..exception.api import ConnectionOperationTimeoutException, MissingAccessTokenException, NotFoundException
 from ..util.api import RelativeRaiseForStatusSession
 from ..util.decorators import retry
 
@@ -803,6 +803,37 @@ class Client(object):
             """
             self.__session = session
 
+        @staticmethod
+        @retry(ConnectionOperationTimeoutException)
+        def get_connection_until_state(session, connection, state):
+            """
+            Retrieve a connection until it enters a certain state using an exponential backoff
+            :param RelativeSession session: a :class:`Client`'s relative session
+            :param Connection connection: the connection
+            :param str state: the expected state
+            :rtype: Connection
+            :raises: .exception.ConnectionOperationTimeoutException
+            """
+            connection = session.get(connection['href']).json()
+            if connection['state'] != state:
+                raise ConnectionOperationTimeoutException(connection=connection)
+            return connection
+
+        @staticmethod
+        @retry(ConnectionOperationTimeoutException)
+        def __get_connection_until_not_found(session, connection):
+            """
+            Retrieve a connection until it no longer exists using an exponential backoff
+            :param RelativeSession session: a :class:`Client`'s relative session
+            :param Connection connection: the connection
+            :raises: .exception.ConnectionOperationTimeoutException
+            """
+            try:
+                connection = session.get(connection['href']).json()
+            except NotFoundException:
+                return
+            raise ConnectionOperationTimeoutException(connection=connection)
+
         def get_by_id(self, connection_id):
             """
             Get a connection with the provided connection id.
@@ -821,22 +852,32 @@ class Client(object):
             """
             return self.__session.get(connection['href']).json()
 
-        def update(self, connection):
+        def update(self, connection, wait_until_active=False):
             """
             Updated a connection.
             :param Connection connection: the connection object
+            :param bool wait_until_active: wait until the connection is active using a backoff retry
             :rtype: Connection
             :raises: .exception.HttpClientException
+            :raises: .exception.ConnectionOperationTimeoutException
             """
-            return self.__session.put(connection['href'], json=connection).json()
+            connection = self.__session.put(connection['href'], json=connection).json()
+            if wait_until_active:
+                return Client.ConnectionsClient.get_connection_until_state(self.__session, connection, 'ACTIVE')
+            else:
+                return connection
 
-        def delete(self, connection):
+        def delete(self, connection, wait_until_deleted=False):
             """
             Delete a connection.
             :param Connection connection: the connection object
+            :param bool wait_until_deleted: wait until the connection is deleted using a backoff retry
             :raises: .exception.HttpClientException
+            :raises: .exception.ConnectionOperationTimeoutException
             """
             self.__session.delete(connection['href'])
+            if wait_until_deleted:
+                Client.ConnectionsClient.__get_connection_until_not_found(self.__session, connection)
 
     class LocationsClient(object):
         def __init__(self, session):
@@ -941,27 +982,20 @@ class Client(object):
             """
             return self.__session.get('%s/connections' % self.__network['href']).json()
 
-        def create(self, connection, wait_until_active=True):
+        def create(self, connection, wait_until_active=False):
             """
             Create a connection for the provided network.
             :param Connection connection: the connect object
             :param bool wait_until_active: wait until the connection is active using a backoff retry
             :rtype: Connection
             :raises: .exception.HttpClientException
-            :raises: .exception.ConnectionFailedToBecomeActiveException
+            :raises: .exception.ConnectionOperationTimeoutException
             """
             connection = self.__session.post('%s/connections' % self.__network['href'], json=connection).json()
             if wait_until_active:
-                return self.__get_connection_until_active(connection)
+                return Client.ConnectionsClient.get_connection_until_state(self.__session, connection, 'ACTIVE')
             else:
                 return connection
-
-        @retry(ConnectionFailedToBecomeActiveException)
-        def __get_connection_until_active(self, connection):
-            connection = self.__session.get(connection['href']).json()
-            if connection['state'] != 'ACTIVE':
-                raise ConnectionFailedToBecomeActiveException(connection=connection)
-            return connection
 
     class OptionsClient(object):
         def __init__(self, session):
