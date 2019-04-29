@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..exception.api import ConnectionOperationTimeoutException, MissingAccessTokenException, NotFoundException
+from ..exception.api import ConnectionOperationFailedException, ConnectionOperationTimeoutException, \
+    MissingAccessTokenException, NotFoundException
 from ..util.api import RelativeRaiseForStatusSession
 from ..util.decorators import retry
 
@@ -805,33 +806,43 @@ class Client(object):
 
         @staticmethod
         @retry(ConnectionOperationTimeoutException)
-        def get_connection_until_state(session, connection, state):
+        def get_connection_until_state(session, connection, state, *failed_states):
             """
             Retrieve a connection until it enters a certain state using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param Connection connection: the connection
             :param str state: the expected state
+            :param str failed_states: a list of failed states that instead
+                raise ConnectionOperationFailedException
             :rtype: Connection
             :raises: .exception.ConnectionOperationTimeoutException
+            :raises: .exception.ConnectionOperationFailedException
             """
             connection = session.get(connection['href']).json()
+            if connection['state'] in failed_states:
+                raise ConnectionOperationFailedException(connection=connection)
             if connection['state'] != state:
                 raise ConnectionOperationTimeoutException(connection=connection)
             return connection
 
         @staticmethod
         @retry(ConnectionOperationTimeoutException)
-        def __get_connection_until_not_found(session, connection):
+        def __get_connection_until_not_found(session, connection, *failed_states):
             """
             Retrieve a connection until it no longer exists using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param Connection connection: the connection
+            :param str failed_states: a list of failed states that instead
+                raise ConnectionOperationFailedException
             :raises: .exception.ConnectionOperationTimeoutException
+            :raises: .exception.ConnectionOperationFailedException
             """
             try:
                 connection = session.get(connection['href']).json()
             except NotFoundException:
                 return
+            if connection['state'] in failed_states:
+                raise ConnectionOperationFailedException(connection=connection)
             raise ConnectionOperationTimeoutException(connection=connection)
 
         def get_by_id(self, connection_id):
@@ -860,10 +871,16 @@ class Client(object):
             :rtype: Connection
             :raises: .exception.HttpClientException
             :raises: .exception.ConnectionOperationTimeoutException
+            :raises: .exception.ConnectionOperationFailedException
             """
             connection = self.__session.put(connection['href'], json=connection).json()
             if wait_until_active:
-                return Client.ConnectionsClient.get_connection_until_state(self.__session, connection, 'ACTIVE')
+                return Client.ConnectionsClient.get_connection_until_state(
+                    self.__session,
+                    connection,
+                    'ACTIVE',
+                    'FAILED_TO_UPDATE'
+                )
             else:
                 return connection
 
@@ -874,10 +891,15 @@ class Client(object):
             :param bool wait_until_deleted: wait until the connection is deleted using a backoff retry
             :raises: .exception.HttpClientException
             :raises: .exception.ConnectionOperationTimeoutException
+            :raises: .exception.ConnectionOperationFailedException
             """
             self.__session.delete(connection['href'])
             if wait_until_deleted:
-                Client.ConnectionsClient.__get_connection_until_not_found(self.__session, connection)
+                Client.ConnectionsClient.__get_connection_until_not_found(
+                    self.__session,
+                    connection,
+                    'FAILED_TO_DELETE'
+                )
 
     class LocationsClient(object):
         def __init__(self, session):
@@ -990,10 +1012,16 @@ class Client(object):
             :rtype: Connection
             :raises: .exception.HttpClientException
             :raises: .exception.ConnectionOperationTimeoutException
+            :raises: .exception.ConnectionOperationFailedException
             """
             connection = self.__session.post('%s/connections' % self.__network['href'], json=connection).json()
             if wait_until_active:
-                return Client.ConnectionsClient.get_connection_until_state(self.__session, connection, 'ACTIVE')
+                return Client.ConnectionsClient.get_connection_until_state(
+                    self.__session,
+                    connection,
+                    'ACTIVE',
+                    'FAILED_TO_PROVISION'
+                )
             else:
                 return connection
 
