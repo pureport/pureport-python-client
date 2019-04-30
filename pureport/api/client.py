@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-from ..exception.api import ConnectionOperationFailedException, ConnectionOperationTimeoutException, \
-    MissingAccessTokenException, NotFoundException
+from enum import Enum
+from ..exception.api import \
+    ConnectionOperationFailedException, \
+    ConnectionOperationTimeoutException, \
+    MissingAccessTokenException, \
+    NotFoundException
 from ..util.api import RelativeRaiseForStatusSession
 from ..util.decorators import retry
 
@@ -28,6 +32,20 @@ Network = dict
 NetworkInvoice = dict
 Option = dict
 SupportedConnection = dict
+
+
+class ConnectionState(Enum):
+    INITIALIZING = "INITIALIZING"
+    WAITING_TO_PROVISION = "WAITING_TO_PROVISION"
+    PROVISIONING = "PROVISIONING"
+    FAILED_TO_PROVISION = "FAILED_TO_PROVISION"
+    ACTIVE = "ACTIVE"
+    DOWN = "DOWN"
+    UPDATING = "UPDATING"
+    FAILED_TO_UPDATE = "FAILED_TO_UPDATE"
+    DELETING = "DELETING"
+    FAILED_TO_DELETE = "FAILED_TO_DELETE"
+    DELETED = "DELETED"
 
 
 class Client(object):
@@ -806,33 +824,33 @@ class Client(object):
 
         @staticmethod
         @retry(ConnectionOperationTimeoutException)
-        def get_connection_until_state(session, connection, state, *failed_states):
+        def get_connection_until_state(session, connection, expected_state, failed_states=[]):
             """
             Retrieve a connection until it enters a certain state using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param Connection connection: the connection
-            :param str state: the expected state
-            :param str failed_states: a list of failed states that instead
+            :param ConnectionState expected_state: the expected state
+            :param list[ConnectionState] failed_states: a list of failed states that instead
                 raise ConnectionOperationFailedException
             :rtype: Connection
             :raises: .exception.ConnectionOperationTimeoutException
             :raises: .exception.ConnectionOperationFailedException
             """
             connection = session.get(connection['href']).json()
-            if connection['state'] in failed_states:
+            if ConnectionState[connection['state']] in failed_states:
                 raise ConnectionOperationFailedException(connection=connection)
-            if connection['state'] != state:
+            if ConnectionState[connection['state']] != expected_state:
                 raise ConnectionOperationTimeoutException(connection=connection)
             return connection
 
         @staticmethod
         @retry(ConnectionOperationTimeoutException)
-        def __get_connection_until_not_found(session, connection, *failed_states):
+        def __get_connection_until_not_found(session, connection, failed_states=[]):
             """
             Retrieve a connection until it no longer exists using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param Connection connection: the connection
-            :param str failed_states: a list of failed states that instead
+            :param list[ConnectionState] failed_states: a list of failed states that instead
                 raise ConnectionOperationFailedException
             :raises: .exception.ConnectionOperationTimeoutException
             :raises: .exception.ConnectionOperationFailedException
@@ -841,7 +859,7 @@ class Client(object):
                 connection = session.get(connection['href']).json()
             except NotFoundException:
                 return
-            if connection['state'] in failed_states:
+            if ConnectionState[connection['state']] in failed_states:
                 raise ConnectionOperationFailedException(connection=connection)
             raise ConnectionOperationTimeoutException(connection=connection)
 
@@ -878,8 +896,8 @@ class Client(object):
                 return Client.ConnectionsClient.get_connection_until_state(
                     self.__session,
                     connection,
-                    'ACTIVE',
-                    'FAILED_TO_UPDATE'
+                    ConnectionState.ACTIVE,
+                    [ConnectionState.FAILED_TO_UPDATE]
                 )
             else:
                 return connection
@@ -898,7 +916,7 @@ class Client(object):
                 Client.ConnectionsClient.__get_connection_until_not_found(
                     self.__session,
                     connection,
-                    'FAILED_TO_DELETE'
+                    [ConnectionState.FAILED_TO_DELETE]
                 )
 
     class LocationsClient(object):
@@ -1019,8 +1037,8 @@ class Client(object):
                 return Client.ConnectionsClient.get_connection_until_state(
                     self.__session,
                     connection,
-                    'ACTIVE',
-                    'FAILED_TO_PROVISION'
+                    ConnectionState.ACTIVE,
+                    [ConnectionState.FAILED_TO_PROVISION]
                 )
             else:
                 return connection
