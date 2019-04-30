@@ -19,7 +19,8 @@ setup(
         'pureport.util'
     ],
     install_requires=[
-        'requests'
+        'requests',
+        'enum34'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

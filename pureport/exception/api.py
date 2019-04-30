@@ -8,6 +8,26 @@ class MissingAccessTokenException(IOError):
     pass
 
 
+class ConnectionOperationTimeoutException(IOError):
+    def __init__(self, *args, **kwargs):
+        """
+        An connection operation took too long to perform
+        :param Connection connection: the connection
+        """
+        self.connection = kwargs.pop('connection', None)
+        super(ConnectionOperationTimeoutException, self).__init__(*args, **kwargs)
+
+
+class ConnectionOperationFailedException(IOError):
+    def __init__(self, *args, **kwargs):
+        """
+        An connection operation failed to perform
+        :param Connection connection: the connection
+        """
+        self.connection = kwargs.pop('connection', None)
+        super(ConnectionOperationFailedException, self).__init__(*args, **kwargs)
+
+
 class ClientHttpException(IOError):
     def __init__(self, *args, **kwargs):
         """
