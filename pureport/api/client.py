@@ -726,7 +726,7 @@ class Client(object):
             :param AccountRole role: the account role object
             :raises: .exception.HttpClientException
             """
-            return self.__session.delete('%s/roles/%s' % (self.__account['href'], role['id'])).json()
+            self.__session.delete('%s/roles/%s' % (self.__account['href'], role['id']))
 
     class AccountSupportedConnectionsClient(object):
         def __init__(self, session, account):
@@ -994,7 +994,7 @@ class Client(object):
             :param Network network: the network object
             :raises: .exception.HttpClientException
             """
-            self.__session.delete(network['href']).json()
+            self.__session.delete(network['href'])
 
         def connections(self, network):
             """
