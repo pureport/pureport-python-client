@@ -1060,7 +1060,7 @@ class Client(object):
             :rtype: dict[str, list[Option]]
             :raises: .exception.HttpClientException
             """
-            return self.__session.get('/options', params={'types': types}).json()
+            return self.__session.get('/options', params={'type': types}).json()
 
     class SupportedConnectionsClient(object):
         def __init__(self, session):
