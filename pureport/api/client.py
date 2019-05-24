@@ -27,6 +27,7 @@ APIKey = dict
 CloudRegion = dict
 CloudService = dict
 Connection = dict
+Facility = dict
 Location = dict
 Network = dict
 NetworkInvoice = dict
@@ -126,6 +127,14 @@ class Client(object):
         :rtype: Client.ConnectionsClient
         """
         return Client.ConnectionsClient(self.__session)
+
+    @property
+    def facilities(self):
+        """
+        The facilities client
+        :rtype: Client.FacilitiesClient
+        """
+        return Client.FacilitiesClient(self.__session)
 
     @property
     def locations(self):
@@ -918,6 +927,40 @@ class Client(object):
                     connection,
                     [ConnectionState.FAILED_TO_DELETE]
                 )
+
+    class FacilitiesClient(object):
+        def __init__(self, session):
+            """
+            The FacilitiesClient client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def list(self):
+            """
+            Get all available facilities.
+            :rtype: list[Facility]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/facilities').json()
+
+        def get_by_id(self, facility_id):
+            """
+            Get a facility with the provided facility id.
+            :param str facility_id: the facility id
+            :rtype: Facility
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/facilities/%s' % facility_id).json()
+
+        def get(self, facility):
+            """
+            Get a facility using the provided facility object.
+            :param Facility facility: the location object
+            :rtype: Facility
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(facility['href']).json()
 
     class LocationsClient(object):
         def __init__(self, session):
