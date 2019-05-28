@@ -5,7 +5,7 @@ from ..exception.api import \
     ConnectionOperationTimeoutException, \
     MissingAccessTokenException, \
     NotFoundException
-from ..util.api import RelativeRaiseForStatusSession
+from ..util.api import PureportSession
 from ..util.decorators import retry
 
 __docformat__ = 'reStructuredText'
@@ -58,7 +58,7 @@ class Client(object):
         to handle exceptions thrown by the API in the form of bad error codes.
         :param str base_url: a base url for the client
         """
-        self.__session = RelativeRaiseForStatusSession(base_url)
+        self.__session = PureportSession(base_url)
 
     @staticmethod
     def to_link(standard_object, title):
@@ -90,11 +90,12 @@ class Client(object):
         :raises: .exception.MissingAccessTokenException
         """
         if key is not None and secret is not None:
-            access_token = self.__session.post('/login', json={'key': key, 'secret': secret}).json()['access_token']
-        if access_token is None:
+            return self.__session.login(key, secret)
+        elif access_token is not None:
+            self.__session.set_access_token(access_token)
+            return access_token
+        else:
             raise MissingAccessTokenException()
-        self.__session.headers.update({'Authorization': 'Bearer %s' % access_token})
-        return access_token
 
     @property
     def accounts(self):
