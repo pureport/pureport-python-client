@@ -93,6 +93,7 @@ class Client(object):
             return self.__session.login(key, secret)
         elif access_token is not None:
             self.__session.set_access_token(access_token)
+            return access_token
         else:
             raise MissingAccessTokenException()
 
