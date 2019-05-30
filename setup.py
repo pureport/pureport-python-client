@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pureport-client',
-    version='0.0.6',
+    version='0.0.7',
     author='Pureport',
     author_email='noreply@pureport.com',
     license='MIT',
