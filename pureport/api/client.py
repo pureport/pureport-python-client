@@ -34,6 +34,7 @@ NetworkInvoice = dict
 Port = dict
 Option = dict
 SupportedConnection = dict
+SupportedPort = dict
 
 
 class ConnectionState(Enum):
@@ -333,6 +334,14 @@ class Client(object):
             :rtype: Client.AccountSupportedConnectionsClient
             """
             return Client.AccountSupportedConnectionsClient(self.__session, account)
+
+        def supported_ports(self, account):
+            """
+            Get the account supported ports client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountSupportedConnectionsClient
+            """
+            return Client.AccountSupportedPortsClient(self.__session, account)
 
     class AccountAPIKeysClient(object):
         def __init__(self, session, account):
@@ -799,6 +808,28 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('%s/supportedConnections' % self.__account['href']).json()
+
+    class AccountSupportedPortsClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Supported Ports client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def list(self, facility):
+            """
+            Get the supported ports for the provided account.
+            :param Facility facility: the facility to list supported ports for
+            :rtype: list[SupportedPort]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(
+                '%s/supportedPorts' % self.__account['href'],
+                params={'facility': facility['id']}
+            ).json()
 
     class CloudRegionsClient(object):
         def __init__(self, session):
