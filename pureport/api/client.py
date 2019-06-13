@@ -31,8 +31,10 @@ Facility = dict
 Location = dict
 Network = dict
 NetworkInvoice = dict
+Port = dict
 Option = dict
 SupportedConnection = dict
+SupportedPort = dict
 
 
 class ConnectionState(Enum):
@@ -162,6 +164,14 @@ class Client(object):
         return Client.OptionsClient(self.__session)
 
     @property
+    def ports(self):
+        """
+        The ports client
+        :rtype: Client.PortsClient
+        """
+        return Client.PortsClient(self.__session)
+
+    @property
     def supported_connections(self):
         """
         The supported connections client
@@ -187,7 +197,7 @@ class Client(object):
 
         def get_by_id(self, account_id):
             """
-            Get an account by it's id.
+            Get an account by its id.
             :param str account_id: the account id
             :rtype: Account
             :raises: .exception.HttpClientException
@@ -301,6 +311,14 @@ class Client(object):
             """
             return Client.AccountPermissionsClient(self.__session, account)
 
+        def ports(self, account):
+            """
+            Get the account ports client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountPortsClient
+            """
+            return Client.AccountPortsClient(self.__session, account)
+
         def roles(self, account):
             """
             Get the account roles client using the provided account.
@@ -316,6 +334,14 @@ class Client(object):
             :rtype: Client.AccountSupportedConnectionsClient
             """
             return Client.AccountSupportedConnectionsClient(self.__session, account)
+
+        def supported_ports(self, account):
+            """
+            Get the account supported ports client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountSupportedConnectionsClient
+            """
+            return Client.AccountSupportedPortsClient(self.__session, account)
 
     class AccountAPIKeysClient(object):
         def __init__(self, session, account):
@@ -676,6 +702,33 @@ class Client(object):
             """
             return self.__session.get('%s/permissions' % self.__account['href']).json()
 
+    class AccountPortsClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Ports client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def list(self):
+            """
+            Get all ports for the provided account.
+            :rtype: list[Port]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('%s/ports' % self.__account['href']).json()
+
+        def create(self, port):
+            """
+            Create a port for the provided account.
+            :param Port port:  the port object
+            :rtype: Port
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/ports' % self.__account['href'], json=port).json()
+
     class AccountRolesClient(object):
         def __init__(self, session, account):
             """
@@ -696,7 +749,7 @@ class Client(object):
 
         def get_by_id(self, role_id):
             """
-            Get a role by it's id for the provided account.
+            Get a role by its id for the provided account.
             :param str role_id: the role id
             :rtype: AccountRole
             :raises: .exception.HttpClientException
@@ -755,6 +808,28 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('%s/supportedConnections' % self.__account['href']).json()
+
+    class AccountSupportedPortsClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Supported Ports client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def list(self, facility):
+            """
+            Get the supported ports for the provided account.
+            :param Facility facility: the facility to list supported ports for
+            :rtype: list[SupportedPort]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(
+                '%s/supportedPorts' % self.__account['href'],
+                params={'facility': facility['id']}
+            ).json()
 
     class CloudRegionsClient(object):
         def __init__(self, session):
@@ -1105,6 +1180,49 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('/options', params={'type': types}).json()
+
+    class PortsClient(object):
+        def __init__(self, session):
+            """
+            The Ports client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def get_by_id(self, port_id):
+            """
+            Get the port with the provided port id.
+            :param str port_id: the port id
+            :rtype: Port
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/ports/%s' % port_id).json()
+
+        def get(self, port):
+            """
+            Get the port using the provided port.
+            :param Port port: the port object
+            :rtype: Port
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(port['href']).json()
+
+        def update(self, port):
+            """
+            Update a port.
+            :param Port port: the port object
+            :rtype: Port
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.put(port['href'], json=port).json()
+
+        def delete(self, port):
+            """
+            Delete a port.
+            :param Port port: the port object
+            :raises: .exception.HttpClientException
+            """
+            self.__session.delete(port['href'])
 
     class SupportedConnectionsClient(object):
         def __init__(self, session):
