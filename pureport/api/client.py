@@ -1198,6 +1198,15 @@ class Client(object):
             """
             return self.__session.get('/ports/%s' % port_id).json()
 
+        def get_accounts_using_port_by_id(self, port_id):
+            """
+            Get the accounts using the port with the provided port id.
+            :param str port_id: the port id
+            :rtype: list[Link]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/ports/%s/accounts' % port_id).json()
+
         def get(self, port):
             """
             Get the port using the provided port.
