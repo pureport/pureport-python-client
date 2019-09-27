@@ -24,17 +24,26 @@ AccountInvite = dict
 AccountMember = dict
 AccountPermissions = dict
 APIKey = dict
+BGPRoute = dict
 CloudRegion = dict
 CloudService = dict
 Connection = dict
+ConnectionTimeEgressIngress = dict
+Gateway = dict
 Facility = dict
 Location = dict
 Network = dict
+NetworkConnectionEgressIngress = dict
 NetworkInvoice = dict
+NetworkTimeUsage = dict
 Port = dict
 Option = dict
 SupportedConnection = dict
 SupportedPort = dict
+Task = dict
+UsageByConnectionAndTimeOptions = dict
+UsageByConnectionOptions = dict
+UsageByNetworkAndTimeOptions = dict
 
 
 class ConnectionState(Enum):
@@ -140,6 +149,14 @@ class Client(object):
         return Client.FacilitiesClient(self.__session)
 
     @property
+    def gateways(self):
+        """
+        The gateways client
+        :rtype: Client.GatewaysClient
+        """
+        return Client.GatewaysClient(self.__session)
+
+    @property
     def locations(self):
         """
         The locations client
@@ -178,6 +195,14 @@ class Client(object):
         :rtype: Client.SupportedConnectionsClient
         """
         return Client.SupportedConnectionsClient(self.__session)
+
+    @property
+    def tasks(self):
+        """
+        The tasks client
+        :rtype: Client.TasksClient
+        """
+        return Client.TasksClient(self.__session)
 
     class AccountsClient(object):
         def __init__(self, session):
@@ -294,6 +319,14 @@ class Client(object):
             :rtype: Client.AccountMembersClient
             """
             return Client.AccountMembersClient(self.__session, account)
+
+        def metrics(self, account):
+            """
+            Get the account metrics client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountMetricsClient
+            """
+            return Client.AccountMetricsClient(self.__session, account)
 
         def networks(self, account):
             """
@@ -656,6 +689,43 @@ class Client(object):
             """
             self.__session.delete('%s/members/%s' % (self.__account['href'], member['user']['id']))
 
+    class AccountMetricsClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Networks client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def usage_by_connection(self, options):
+            """
+            Retrieve egress/ingress total usage by connections
+            :param UsageByConnectionOptions options:
+            :rtype: list[NetworkConnectionEgressIngress]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByConnection' % self.__account['href'], json=options).json()
+
+        def usage_by_connection_and_time(self, options):
+            """
+            Retrieve usage by a single connection over time
+            :param UsageByConnectionAndTimeOptions options:
+            :rtype: list[ConnectionTimeEgressIngress]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByConnectionAndTime' % self.__account['href'], json=options).json()
+
+        def usage_by_network_and_time(self, options):
+            """
+            Retrieve usage of networks over time
+            :param UsageByNetworkAndTimeOptions options:
+            :rtype: list[NetworkTimeUsage]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByNetworkAndTime' % self.__account['href'], json=options).json()
+
     class AccountNetworksClient(object):
         def __init__(self, session, account):
             """
@@ -1004,6 +1074,34 @@ class Client(object):
                     [ConnectionState.FAILED_TO_DELETE]
                 )
 
+        def get_tasks_by_id(self, connection_id):
+            """
+            Get the tasks for a connection.
+            :param str connection_id: the connection id
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/connections/%s/tasks' % connection_id).json()
+
+        def get_tasks(self, connection):
+            """
+            Get the tasks for a connection.
+            :param Connection connection: the connection
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('%s/tasks' % connection['href']).json()
+
+        def create_task(self, connection, task):
+            """
+            Create a task for a connection.
+            :param Connection connection: the connection
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/tasks' % connection['href'], json=task).json()
+
     class FacilitiesClient(object):
         def __init__(self, session):
             """
@@ -1037,6 +1135,70 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get(facility['href']).json()
+
+    class GatewaysClient(object):
+        def __init__(self, session):
+            """
+            The GatewaysClient client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def get_bgp_routes(self, gateway):
+            """
+            Get the bgp routes for a gateway.
+            :param Gateway gateway: the gateway
+            :rtype: list[BGPRoute]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/bgpRoutes' % gateway['id']).json()
+
+        def get_bgp_routes_by_id(self, gateway_id):
+            """
+            Get the bgp routes for a gateway.
+            :param str gateway_id: the gateway id
+            :rtype: list[BGPRoute]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/bgpRoutes' % gateway_id).json()
+
+        def get_tasks_by_id(self, gateway_id):
+            """
+            Get the tasks for a gateway.
+            :param str gateway_id: the gateway id
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/tasks' % gateway_id).json()
+
+        def get_tasks(self, gateway):
+            """
+            Get the tasks for a gateway.
+            :param Gateway gateway: the gateway
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/tasks' % gateway['id']).json()
+
+        def create_task_by_id(self, gateway_id, task):
+            """
+            Create a task for a gateway.
+            :param str gateway_id: the gateway id
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/tasks' % gateway_id, json=task).json()
+
+        def create_task(self, gateway, task):
+            """
+            Create a task for a gateway.
+            :param Gateway gateway: the gateway
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/tasks' % gateway['id'], json=task).json()
 
     class LocationsClient(object):
         def __init__(self, session):
@@ -1198,6 +1360,15 @@ class Client(object):
             """
             return self.__session.get('/ports/%s' % port_id).json()
 
+        def get_accounts_using_port_by_id(self, port_id):
+            """
+            Get the accounts using the port with the provided port id.
+            :param str port_id: the port id
+            :rtype: list[Link]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/ports/%s/accounts' % port_id).json()
+
         def get(self, port):
             """
             Get the port using the provided port.
@@ -1249,3 +1420,37 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get(supported_connection['href']).json()
+
+    class TasksClient(object):
+        def __init__(self, session):
+            """
+            The Tasks client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def list(self):
+            """
+            List all tasks.
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/tasks').json()
+
+        def get_by_id(self, task_id):
+            """
+            Get a task by it's id.
+            :param str task_id: the task id
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/tasks/%s' % task_id).json()
+
+        def get(self, task):
+            """
+            Get the task using the provided task.
+            :param Task task: the task object
+            :rtype: SupportedConnection
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(task['href']).json()
