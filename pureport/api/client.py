@@ -40,6 +40,7 @@ Port = dict
 Option = dict
 SupportedConnection = dict
 SupportedPort = dict
+Task = dict
 UsageByConnectionAndTimeOptions = dict
 UsageByConnectionOptions = dict
 UsageByNetworkAndTimeOptions = dict
@@ -194,6 +195,14 @@ class Client(object):
         :rtype: Client.SupportedConnectionsClient
         """
         return Client.SupportedConnectionsClient(self.__session)
+
+    @property
+    def tasks(self):
+        """
+        The tasks client
+        :rtype: Client.TasksClient
+        """
+        return Client.TasksClient(self.__session)
 
     class AccountsClient(object):
         def __init__(self, session):
@@ -1065,6 +1074,34 @@ class Client(object):
                     [ConnectionState.FAILED_TO_DELETE]
                 )
 
+        def get_tasks_by_id(self, connection_id):
+            """
+            Get the tasks for a connection.
+            :param str connection_id: the connection id
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/connections/%s/tasks' % connection_id).json()
+
+        def get_tasks(self, connection):
+            """
+            Get the tasks for a connection.
+            :param Connection connection: the connection
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('%s/tasks' % connection['href']).json()
+
+        def create_task(self, connection, task):
+            """
+            Create a task for a connection.
+            :param Connection connection: the connection
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/tasks' % connection['href'], json=task).json()
+
     class FacilitiesClient(object):
         def __init__(self, session):
             """
@@ -1124,6 +1161,44 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('/gateways/%s/bgpRoutes' % gateway_id).json()
+
+        def get_tasks_by_id(self, gateway_id):
+            """
+            Get the tasks for a gateway.
+            :param str gateway_id: the gateway id
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/tasks' % gateway_id).json()
+
+        def get_tasks(self, gateway):
+            """
+            Get the tasks for a gateway.
+            :param Gateway gateway: the gateway
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/tasks' % gateway['id']).json()
+
+        def create_task_by_id(self, gateway_id, task):
+            """
+            Create a task for a gateway.
+            :param str gateway_id: the gateway id
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/tasks' % gateway_id, json=task).json()
+
+        def create_task(self, gateway, task):
+            """
+            Create a task for a gateway.
+            :param Gateway gateway: the gateway
+            :param Task task: the task
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/tasks' % gateway['id'], json=task).json()
 
     class LocationsClient(object):
         def __init__(self, session):
@@ -1345,3 +1420,37 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get(supported_connection['href']).json()
+
+    class TasksClient(object):
+        def __init__(self, session):
+            """
+            The Tasks client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def list(self):
+            """
+            List all tasks.
+            :rtype: list[Task]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/tasks').json()
+
+        def get_by_id(self, task_id):
+            """
+            Get a task by it's id.
+            :param str task_id: the task id
+            :rtype: Task
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/tasks/%s' % task_id).json()
+
+        def get(self, task):
+            """
+            Get the task using the provided task.
+            :param Task task: the task object
+            :rtype: SupportedConnection
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(task['href']).json()
