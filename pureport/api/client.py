@@ -24,17 +24,25 @@ AccountInvite = dict
 AccountMember = dict
 AccountPermissions = dict
 APIKey = dict
+BGPRoute = dict
 CloudRegion = dict
 CloudService = dict
 Connection = dict
+ConnectionTimeEgressIngress = dict
+Gateway = dict
 Facility = dict
 Location = dict
 Network = dict
+NetworkConnectionEgressIngress = dict
 NetworkInvoice = dict
+NetworkTimeUsage = dict
 Port = dict
 Option = dict
 SupportedConnection = dict
 SupportedPort = dict
+UsageByConnectionAndTimeOptions = dict
+UsageByConnectionOptions = dict
+UsageByNetworkAndTimeOptions = dict
 
 
 class ConnectionState(Enum):
@@ -138,6 +146,14 @@ class Client(object):
         :rtype: Client.FacilitiesClient
         """
         return Client.FacilitiesClient(self.__session)
+
+    @property
+    def gateways(self):
+        """
+        The gateways client
+        :rtype: Client.GatewaysClient
+        """
+        return Client.GatewaysClient(self.__session)
 
     @property
     def locations(self):
@@ -294,6 +310,14 @@ class Client(object):
             :rtype: Client.AccountMembersClient
             """
             return Client.AccountMembersClient(self.__session, account)
+
+        def metrics(self, account):
+            """
+            Get the account metrics client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountMetricsClient
+            """
+            return Client.AccountMetricsClient(self.__session, account)
 
         def networks(self, account):
             """
@@ -655,6 +679,43 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             self.__session.delete('%s/members/%s' % (self.__account['href'], member['user']['id']))
+
+    class AccountMetricsClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Networks client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def usage_by_connection(self, options):
+            """
+            Retrieve egress/ingress total usage by connections
+            :param UsageByConnectionOptions options:
+            :rtype: list[NetworkConnectionEgressIngress]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByConnection' % self.__account['href'], json=options).json()
+
+        def usage_by_connection_and_time(self, options):
+            """
+            Retrieve usage by a single connection over time
+            :param UsageByConnectionAndTimeOptions options:
+            :rtype: list[ConnectionTimeEgressIngress]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByConnectionAndTime' % self.__account['href'], json=options).json()
+
+        def usage_by_network_and_time(self, options):
+            """
+            Retrieve usage of networks over time
+            :param UsageByNetworkAndTimeOptions options:
+            :rtype: list[NetworkTimeUsage]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('%s/metrics/usageByNetworkAndTime' % self.__account['href'], json=options).json()
 
     class AccountNetworksClient(object):
         def __init__(self, session, account):
@@ -1037,6 +1098,32 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get(facility['href']).json()
+
+    class GatewaysClient(object):
+        def __init__(self, session):
+            """
+            The GatewaysClient client
+            :param RelativeSession session:
+            """
+            self.__session = session
+
+        def get_bgp_routes(self, gateway):
+            """
+            Get the bgp routes for a gateway.
+            :param Gateway gateway: the gateway
+            :rtype: list[BGPRoute]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/bgpRoutes' % gateway['id']).json()
+
+        def get_bgp_routes_by_id(self, gateway_id):
+            """
+            Get the bgp routes for a gateway.
+            :param str gateway_id: the gateway id
+            :rtype: list[BGPRoute]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/bgpRoutes' % gateway_id).json()
 
     class LocationsClient(object):
         def __init__(self, session):
