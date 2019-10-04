@@ -23,6 +23,7 @@ AccountConsent = dict
 AccountInvite = dict
 AccountMember = dict
 AccountPermissions = dict
+AuditEntry = dict
 APIKey = dict
 BGPRoute = dict
 CloudRegion = dict
@@ -36,6 +37,7 @@ Network = dict
 NetworkConnectionEgressIngress = dict
 NetworkInvoice = dict
 NetworkTimeUsage = dict
+Page = dict
 Port = dict
 Option = dict
 SupportedConnection = dict
@@ -271,6 +273,14 @@ class Client(object):
             :rtype: Client.AccountAPIKeysClient
             """
             return Client.AccountAPIKeysClient(self.__session, account)
+        
+        def audit_log(self, account):
+            """
+            Get the account audit log client using the provided account.
+            :param Account account: the account object
+            :rtype: Client.AccountAuditLogClient
+            """
+            return Client.AccountAuditLogClient(self.__session, account)
 
         def billing(self, account):
             """
@@ -437,6 +447,59 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             self.__session.delete('%s/apikeys/%s' % (self.__account['href'], api_key['key']))
+
+    class AccountAuditLogClient(object):
+        def __init__(self, session, account):
+            """
+            The Account Audit Log client
+            :param RelativeSession session:
+            :param Account account:
+            """
+            self.__session = session
+            self.__account = account
+
+        def query(self, page_number=None, page_size=None, sort=None, sort_direction=None,
+                  start_time=None, end_time=None, include_child_accounts=None, event_types=None,
+                  result=None, principal_id=None, ip_address=None, correlation_id=None, subject_id=None,
+                  subject_type=None):
+            """
+            Query the audit log for this account.
+            :param int page_number:
+            :param int page_size:
+            :param str sort:
+            :param str sort_direction:
+            :param str start_time: formatted as 'YYYY-MM-DDT00:00:00.000Z'
+            :param str end_time: formatted as 'YYYY-MM-DDT00:00:00.000Z'
+            :param bool include_child_accounts:
+            :param list[str] event_types:
+            :param str result:
+            :param str principal_id:
+            :param str ip_address:
+            :param str correlation_id:
+            :param str subject_id:
+            :param str subject_type:
+            :rtype: Page[AuditEntry]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get(
+                '%s/auditLog' % self.__account['href'],
+                params={
+                    'pageNumber': page_number,
+                    'pageSize': page_size,
+                    'sort': sort,
+                    'sortDirection': sort_direction,
+                    'startTime': start_time,
+                    'endTime': end_time,
+                    'includeChildAccounts': include_child_accounts,
+                    'eventTypes': event_types,
+                    'result': result,
+                    'principalId': principal_id,
+                    'ipAddress': ip_address,
+                    'correlationId': correlation_id,
+                    'subjectId': subject_id,
+                    'subjectType': subject_type
+                }
+            ).json()
 
     class AccountBillingClient(object):
         def __init__(self, session, account):
