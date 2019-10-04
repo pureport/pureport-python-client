@@ -273,7 +273,7 @@ class Client(object):
             :rtype: Client.AccountAPIKeysClient
             """
             return Client.AccountAPIKeysClient(self.__session, account)
-        
+
         def audit_log(self, account):
             """
             Get the account audit log client using the provided account.
