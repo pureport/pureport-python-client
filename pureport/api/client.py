@@ -30,6 +30,8 @@ CloudRegion = dict
 CloudService = dict
 Connection = dict
 ConnectionTimeEgressIngress = dict
+ConnectivityByGateway = dict
+DateFilter = dict
 Gateway = dict
 Facility = dict
 Location = dict
@@ -214,13 +216,24 @@ class Client(object):
             """
             self.__session = session
 
-        def list(self):
+        def list(self, ids=None, parent_id=None, name=None, limit=None):
             """
             Get a list of all accounts.
             :rtype: list[Account]
+            :param list[str] ids: a list of account ids to find
+            :param str parent_id: a parent account id
+            :param str name: a name for lowercase inter-word checking
+            :param int limit: the max number to return
             :raises: .exception.HttpClientException
             """
-            return self.__session.get('/accounts').json()
+            return self.__session.get(
+                '/accounts',
+                params={
+                    'ids': ids,
+                    'parentId': parent_id,
+                    'name': name,
+                    'limit': limit
+                }).json()
 
         def get_by_id(self, account_id):
             """
@@ -1207,6 +1220,15 @@ class Client(object):
             """
             self.__session = session
 
+        def get_by_id(self, gateway_id):
+            """
+            Get a gateway by its id
+            :param str gateway_id: the gateway id
+            :rtype: Gateway
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s' % gateway_id).json()
+
         def get_bgp_routes(self, gateway):
             """
             Get the bgp routes for a gateway.
@@ -1224,6 +1246,44 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('/gateways/%s/bgpRoutes' % gateway_id).json()
+
+        def get_connectivity_over_time(self, gateway, date_filter):
+            """
+            Get the connectivity details for a gateway over time.
+            :param Gateway gateway: the gateway
+            :param DateFilter date_filter: a date filter consisting of 'gt', 'lt', 'gte', 'lte' properties
+            :rtype: list[ConnectivityByGateway]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/metrics/connectivity' % gateway['id'], json=date_filter).json()
+
+        def get_connectivity_over_time_by_id(self, gateway_id, date_filter):
+            """
+            Get the connectivity details for a gateway by id over time.
+            :param str gateway_id: the gateway id
+            :param DateFilter date_filter: a date filter consisting of 'gt', 'lt', 'gte', 'lte' properties
+            :rtype: list[ConnectivityByGateway]
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.post('/gateways/%s/metrics/connectivity' % gateway_id, json=date_filter).json()
+
+        def get_latest_connectivity(self, gateway):
+            """
+            Get the current connectivity details for a gateway.
+            :param Gateway gateway: the gateway
+            :rtype: ConnectivityByGateway
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/metrics/connectivity/current' % gateway['id']).json()
+
+        def get_latest_connectivity_by_id(self, gateway_id):
+            """
+            Get the current connectivity details for a gateway by id.
+            :param str gateway_id: the gateway id
+            :rtype: ConnectivityByGateway
+            :raises: .exception.HttpClientException
+            """
+            return self.__session.get('/gateways/%s/metrics/connectivity/current' % gateway_id).json()
 
         def get_tasks_by_id(self, gateway_id):
             """
@@ -1492,13 +1552,14 @@ class Client(object):
             """
             self.__session = session
 
-        def list(self):
+        def list(self, state=None):
             """
             List all tasks.
+            :param str state: find all tasks for a particular state
             :rtype: list[Task]
             :raises: .exception.HttpClientException
             """
-            return self.__session.get('/tasks').json()
+            return self.__session.get('/tasks', params={'state': state}).json()
 
         def get_by_id(self, task_id):
             """
