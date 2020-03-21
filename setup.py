@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 setup(
     name='pureport-client',
@@ -11,20 +11,18 @@ setup(
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/pureport/pureport-python-client',
-    packages=find_packages(),
-    namespace_packages=[
-        'pureport',
-        'pureport.api',
-        'pureport.exception',
-        'pureport.util'
-    ],
+    packages=find_namespace_packages(include=[
+        'pureport.*',
+        'pureport.api.*',
+        'pureport.exception.*',
+        'pureport.util.*'
+    ]),
     install_requires=[
         'requests',
         'enum34'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 2',
         'Operating System :: OS Independent',
     ]
 )
