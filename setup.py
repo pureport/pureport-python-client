@@ -36,6 +36,11 @@ setup(
         'pureport.util.*'
     ]),
     install_requires=read_requirements('requirements.txt'),
+    entry_points={
+        'console_scripts': [
+            'pureport=pureport.cli.cli:cli'
+        ]
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
