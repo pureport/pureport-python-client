@@ -2,6 +2,8 @@
 *.swp
 *.iml
 *.egg-info/
+.tox/
 build/
 dist/
+venv/
 __pycache__

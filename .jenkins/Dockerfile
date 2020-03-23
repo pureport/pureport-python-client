@@ -1,2 +1,5 @@
 FROM python:3
-RUN pip install flake8 twine
+RUN pip install \
+      tox \
+      virtualenv \
+      twine
