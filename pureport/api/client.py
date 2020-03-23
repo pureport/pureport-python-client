@@ -1015,8 +1015,8 @@ class Client(object):
             Retrieve a connection until it enters a certain state using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param str connection_id: the connection id
-            :param ConnectionState expected_state: the expected state
-            :param list[ConnectionState] failed_states: a list of failed states that instead
+            :param ConnectionState|str expected_state: the expected state
+            :param list[ConnectionState|str] failed_states: a list of failed states that instead
             :rtype: Connection
             :raises: .exception.ConnectionOperationTimeoutException
             :raises: .exception.ConnectionOperationFailedException
@@ -1035,7 +1035,7 @@ class Client(object):
             Retrieve a connection until it no longer exists using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param str connection_id: the connection id
-            :param list[ConnectionState] failed_states: a list of failed states that instead
+            :param list[ConnectionState|str] failed_states: a list of failed states that instead
             :raises: .exception.ConnectionOperationTimeoutException
             :raises: .exception.ConnectionOperationFailedException
             """
