@@ -755,7 +755,10 @@ class Client(object):
             :rtype: AccountMember
             :raises: .exception.HttpClientException
             """
-            return self.__session.put('%s/members/%s' % (self.__account['href'], member['user']['id']), json=member).json()
+            return self.__session.put(
+                '%s/members/%s' % (self.__account['href'], member['user']['id']),
+                json=member
+            ).json()
 
         def delete(self, member):
             """
@@ -791,7 +794,10 @@ class Client(object):
             :rtype: list[ConnectionTimeEgressIngress]
             :raises: .exception.HttpClientException
             """
-            return self.__session.post('%s/metrics/usageByConnectionAndTime' % self.__account['href'], json=options).json()
+            return self.__session.post(
+                '%s/metrics/usageByConnectionAndTime' % self.__account['href'],
+                json=options
+            ).json()
 
         def usage_by_network_and_time(self, options):
             """

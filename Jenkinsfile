@@ -4,7 +4,7 @@ pipeline {
         stage('Lint') {
             steps {
                 sh """
-                    flake8
+                    tox
                 """
             }
         }
