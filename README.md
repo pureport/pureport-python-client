@@ -1,9 +1,14 @@
 # Pureport Python Client
-A thin Python 2/3 client for the Pureport ReST API, backed by [requests](http://docs.python-requests.org/en/master/).
+A thin Python 3 client for the Pureport ReST API, backed by [requests](http://docs.python-requests.org/en/master/).
 
 ## Install
 ```bash
 pip install pureport-client
+```
+
+For Python2, you can use any version prior to 1.0.0.
+```bash
+pip install pureport-client<1
 ```
 
 ## Usage
@@ -20,10 +25,10 @@ accounts = client.accounts.list()
 first_account = accounts[0]
 
 ### List all Networks for the first Account
-networks = client.accounts.networks(first_account).list()
+networks = client.accounts.networks(first_account['id']).list()
 
 ### Create a Network for the Account
-new_network = client.accounts.networks(first_account).create({
+new_network = client.accounts.networks(first_account['id']).create({
     'name': 'My First Network'
 })
 
@@ -48,25 +53,22 @@ new_connection_data = {
 
 new_connection = None
 try:
-    new_connection = client.networks.connections(new_network).create(new_connection_data)
+    new_connection = client.networks.connections(new_network['id']).create(new_connection_data)
 except ClientHttpException as e:
     print(e.response.text)
     
 ### Retrieve the new AWS Connection by the returned object
-client.connections.get(new_connection)
-
-### Retrieve the new AWS Connection by it's 'id'
-client.connections.get_by_id(new_connection['id'])
+client.connections.get(new_connection['id'])
 
 ### Delete the new AWS Connection
-client.connections.delete(new_connection)
+client.connections.delete(new_connection['id'])
 
 ### Expect a 404 error for the deleted connection
 try:
-    client.connections.get(new_connection)
+    client.connections.get(new_connection['id'])
 except NotFoundException as e:
     print(e.response.text)
     
 ### Delete the Network
-client.networks.delete(new_network)
+client.networks.delete(new_network['id'])
 ```
