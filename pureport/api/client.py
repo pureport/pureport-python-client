@@ -219,11 +219,11 @@ class Client(object):
         def list(self, ids=None, parent_id=None, name=None, limit=None):
             """
             Get a list of all accounts.
-            :rtype: list[Account]
             :param list[str] ids: a list of account ids to find
             :param str parent_id: a parent account id
             :param str name: a name for lowercase inter-word checking
             :param int limit: the max number to return
+            :rtype: list[Account]
             :raises: .exception.HttpClientException
             """
             return self.__session.get(
@@ -938,16 +938,16 @@ class Client(object):
             self.__session = session
             self.__account_id = account_id
 
-        def list(self, facility):
+        def list(self, facility_id):
             """
             Get the supported ports for the provided account.
-            :param Facility facility: the facility to list supported ports for
+            :param str facility_id: the facility id to list supported ports for
             :rtype: list[SupportedPort]
             :raises: .exception.HttpClientException
             """
             return self.__session.get(
                 '/accounts/%s/supportedPorts' % self.__account_id,
-                params={'facility': facility['id']}
+                params={'facility': facility_id}
             ).json()
 
     class CloudRegionsClient(object):
@@ -1086,7 +1086,7 @@ class Client(object):
             :raises: .exception.ConnectionOperationTimeoutException
             :raises: .exception.ConnectionOperationFailedException
             """
-            self.__session.delete(connection_id)
+            self.__session.delete('/connections/%s' % connection_id)
             if wait_until_deleted:
                 Client.ConnectionsClient.__get_connection_until_not_found(
                     self.__session,
