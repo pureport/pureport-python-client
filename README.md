@@ -72,3 +72,51 @@ except NotFoundException as e:
 ### Delete the Network
 client.networks.delete(new_network['id'])
 ```
+
+## CLI Usage
+This uses [jq](https://stedolan.github.io/jq/) to help parse the JSON output from the Pureport client.
+
+```shell script
+export PUREPORT_API_KEY="MY_API_KEY"
+export PUREPORT_API_SECRET="MY_API_SECRET"
+
+### List accounts
+pureport accounts list | jq
+
+### List all networks for the first account
+first_account_id=$(pureport accounts list --name traynham | jq -r '.[0].id')
+pureport accounts networks $first_account_id list
+
+### Create a Network for the Account and persist it's id
+new_network_id=$(pureport accounts networks $first_account_id create '{"name": "My First Network"}' | jq -r '.id')
+
+### List all pureport locations
+pureport locations list | jq
+
+### Create a link object with the first location
+location_link=$(pureport locations list | jq -r '.[0] | {id: .id, href: .href, title: .name}')
+
+### Create an AWS Connection
+new_connection_id=$(pureport networks connections $new_network_id create --wait_until_active '{
+    "name": "My First AWS Connection",
+    "type": "AWS_DIRECT_CONNECT",
+    "speed": 50,
+    "highAvailability": true,
+    "peering": {
+        "type": "PRIVATE"
+    },
+    "location": '$location_link',
+    "billingTerm": "HOURLY",
+    "awsAccountId": "YOUR_AWS_ACCOUNT_ID",
+    "awsRegion": "YOUR_AWS_REGION"
+}' | jq -r '.id')
+
+### Retrieve the new AWS Connection with the returned id
+pureport connections get $new_connection_id | jq
+
+### Delete the new AWS Connection
+pureport connections delete --wait_until_deleted $new_connection_id
+
+### Delete the Network
+pureport networks delete $new_network_id
+```

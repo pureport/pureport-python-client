@@ -3,6 +3,8 @@ from functools import update_wrapper
 from json import dumps
 from inspect import isgeneratorfunction, isfunction, ismethod
 
+from ..exception.api import ClientHttpException
+
 
 def __create_client_group(f):
     """
@@ -57,11 +59,15 @@ def __create_client_command(f):
 
     @pass_obj
     def new_func(obj, *args, **kwargs):
-        response = actual_f(obj, *args, **kwargs)
-        # if the function returns a response, we'll just echo it as JSON
-        if response is not None:
-            echo(dumps(response))
-        return response
+        try:
+            response = actual_f(obj, *args, **kwargs)
+            # if the function returns a response, we'll just echo it as JSON
+            if response is not None:
+                echo(dumps(response))
+            return response
+        except ClientHttpException as e:
+            echo(e.response.text)
+            raise e
 
     new_func = update_wrapper(new_func, actual_f)
     return command()(new_func)

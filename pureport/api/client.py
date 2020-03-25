@@ -1239,7 +1239,7 @@ class Client(object):
             """
             return self.__session.get('/connections/%s' % connection_id).json()
 
-        @argument('connection')
+        @argument('connection', type=JSON)
         @option('-w', '--wait_until_active', is_flag=True,
                 help='Wait until the connection is active.')
         def update(self, connection, wait_until_active=False):
@@ -1512,7 +1512,7 @@ class Client(object):
             """
             return self.__session.get('/networks/%s/connections' % self.__network_id).json()
 
-        @argument('connection')
+        @argument('connection', type=JSON)
         @option('-w', '--wait_until_active', is_flag=True,
                 help='Wait until the connection is active.')
         def create(self, connection, wait_until_active=False):
