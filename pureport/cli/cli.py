@@ -5,22 +5,22 @@ from .util import construct_commands, find_client_commands
 
 
 @group(context_settings={'auto_envvar_prefix': 'PUREPORT'})
-@option('-u', '--base_url', default=API_URL, help='The base url for this client.')
+@option('-u', '--api_url', default=API_URL, help='The api url for this client.')
 @option('-k', '--api_key', help='The API Key.')
 @option('-s', '--api_secret', help='The API Key secret.')
 @option('-t', '--access_token', help='The API Key access token.')
 @version_option()
 @pass_context
-def cli(ctx, base_url, api_key, api_secret, access_token):
+def cli(ctx, api_url, api_key, api_secret, access_token):
     """
     \f
     :param click.Context ctx:
-    :param str base_url:
+    :param str api_url:
     :param str api_key:
     :param str api_secret:
     :param str access_token:
     """
-    client = Client(base_url=base_url)
+    client = Client(base_url=api_url)
     client.login(api_key, api_secret, access_token)
     ctx.obj = client
 

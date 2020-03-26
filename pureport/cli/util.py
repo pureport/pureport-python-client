@@ -1,9 +1,52 @@
-from click import command, group, echo, pass_context, pass_obj
+from click import command, group, echo, pass_context, pass_obj, Option
 from functools import update_wrapper
 from json import dumps
 from inspect import isgeneratorfunction, isfunction, ismethod
 
 from ..exception.api import ClientHttpException
+
+
+def __insert_click_param(f, param):
+    """
+    Much like :func:`click.decorators._param_memo`, this updates
+    the params on a command, but instead of append, it prepends
+    the parameter
+    :param function f:
+    :param click.Parameter param:
+    """
+    if not hasattr(f, "__click_params__"):
+        f.__click_params__ = []
+    f.__click_params__.insert(0, param)
+
+
+def __create_print_wrapper(f):
+    """
+    Creates a print wrapper for commands.  This adds the necessary options for
+    formatting results as well as wrapping the command to handle those formatting
+    options.
+    :param function f:
+    :rtype: function
+    """
+    def new_func(*args, **kwargs):
+        try:
+            formatted = kwargs.pop('format')
+            response = f(*args, **kwargs)
+            # if the function returns a response, we'll just echo it as JSON
+            if response is not None:
+                if formatted:
+                    echo(dumps(response, indent=2, sort_keys=True))
+                else:
+                    echo(dumps(response))
+            return response
+        except ClientHttpException as e:
+            echo(e.response.text)
+            raise e
+    new_func = update_wrapper(new_func, f)
+    __insert_click_param(new_func,
+                         Option(['--format/--no-format'],
+                                default=True,
+                                help='Whether JSON responses should be formatted or not.'))
+    return new_func
 
 
 def __create_client_group(f):
@@ -56,18 +99,11 @@ def __create_client_command(f):
     :rtype: click.Command
     """
     actual_f = f.fget if isinstance(f, property) else f
+    actual_f = __create_print_wrapper(f)
 
     @pass_obj
     def new_func(obj, *args, **kwargs):
-        try:
-            response = actual_f(obj, *args, **kwargs)
-            # if the function returns a response, we'll just echo it as JSON
-            if response is not None:
-                echo(dumps(response))
-            return response
-        except ClientHttpException as e:
-            echo(e.response.text)
-            raise e
+        return actual_f(obj, *args, **kwargs)
 
     new_func = update_wrapper(new_func, actual_f)
     return command()(new_func)
