@@ -7,12 +7,13 @@ from os.path import exists, expanduser
 from os import getenv
 from yaml import safe_load
 
-from ..exception.api import \
-    ClientHttpException, \
-    ConnectionOperationFailedException, \
-    ConnectionOperationTimeoutException, \
-    MissingAccessTokenException, \
+from ..exception.api import (
+    ClientHttpException,
+    ConnectionOperationFailedException,
+    ConnectionOperationTimeoutException,
+    MissingAccessTokenException,
     NotFoundException
+)
 from ..util.api import PureportSession
 from ..util.decorators import retry
 
