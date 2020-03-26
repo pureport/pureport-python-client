@@ -1,7 +1,8 @@
-from click import command, group, echo, pass_context, pass_obj, Option
+from click import command, group, echo, pass_context, pass_obj, Choice, Option
 from functools import update_wrapper
-from json import dumps
+from json import dumps as json_dumps
 from inspect import isgeneratorfunction, isfunction, ismethod
+from yaml import dump as yaml_dumps
 
 from ..exception.api import ClientHttpException
 
@@ -29,23 +30,26 @@ def __create_print_wrapper(f):
     """
     def new_func(*args, **kwargs):
         try:
-            formatted = kwargs.pop('format')
+            response_format = kwargs.pop('format')
             response = f(*args, **kwargs)
             # if the function returns a response, we'll just echo it as JSON
             if response is not None:
-                if formatted:
-                    echo(dumps(response, indent=2, sort_keys=True))
-                else:
-                    echo(dumps(response))
+                if response_format == 'json_pp':
+                    echo(json_dumps(response, indent=2, sort_keys=True))
+                elif response_format == 'json':
+                    echo(json_dumps(response))
+                elif response_format == 'yaml':
+                    echo(yaml_dumps(response))
             return response
         except ClientHttpException as e:
             echo(e.response.text)
             raise e
     new_func = update_wrapper(new_func, f)
     __insert_click_param(new_func,
-                         Option(['--format/--no-format'],
-                                default=True,
-                                help='Whether JSON responses should be formatted or not.'))
+                         Option(['--format'],
+                                type=Choice(['json_pp', 'json', 'yaml']),
+                                default='json_pp',
+                                help='Specify how responses should be formatted and echoed to the terminal.'))
     return new_func
 
 
