@@ -2,17 +2,32 @@
 from click import Choice, argument, option
 from click_params import JSON
 from enum import Enum
-from ..exception.api import \
-    ConnectionOperationFailedException, \
-    ConnectionOperationTimeoutException, \
-    MissingAccessTokenException, \
+from logging import basicConfig, getLogger
+from os.path import exists, expanduser
+from os import getenv
+from yaml import safe_load
+
+from ..exception.api import (
+    ClientHttpException,
+    ConnectionOperationFailedException,
+    ConnectionOperationTimeoutException,
+    MissingAccessTokenException,
     NotFoundException
+)
 from ..util.api import PureportSession
 from ..util.decorators import retry
 
 __docformat__ = 'reStructuredText'
 
+basicConfig()
+logger = getLogger('pureport.api.client')
+
 API_URL = "https://api.pureport.com"
+API_CONFIG_PATH = expanduser('~/.pureport/credentials.yml')
+ENVIRONMENT_API_URL = 'PUREPORT_API_URL'
+ENVIRONMENT_API_KEY = 'PUREPORT_API_KEY'
+ENVIRONMENT_API_SECRET = 'PUREPORT_API_SECRET'
+ENVIRONMENT_API_PROFILE = 'PUREPORT_API_PROFILE'
 
 """
 TODO(mtraynham): These aliases are simply for documentation.  Maybe in the future we'll extend them
@@ -68,15 +83,28 @@ class ConnectionState(Enum):
 
 
 class Client(object):
-    def __init__(self, base_url=API_URL):
+    def __init__(self, base_url=None,
+                 key=None, secret=None,
+                 access_token=None, profile=None):
         """
         Client for the Pureport ReST API
         This client is a thin wrapper around :module:`requests`.
         All API methods return a :class:`requests.Response` object.  It's up to the user
         to handle exceptions thrown by the API in the form of bad error codes.
         :param str base_url: a base url for the client
+        :param str key: the key to use for login
+        :param str secret: the secret to user for login
+        :param str access_token: the access token obtained externally for an API key
+        :param str profile: the pureport profile to use when using credentials from a file
         """
         self.__session = PureportSession(base_url)
+        try:
+            self.login(key, secret, access_token, profile, base_url)  # Attempt login
+        except MissingAccessTokenException:
+            pass
+        except ClientHttpException as e:
+            logger.exception('There was an attempt to authenticate with '
+                             'Pureport, but it failed.', e)
 
     @staticmethod
     def to_link(standard_object, title):
@@ -94,7 +122,25 @@ class Client(object):
             'title': title,
         }
 
-    def login(self, key=None, secret=None, access_token=None):
+    @staticmethod
+    def __get_file_based_credentials(profile=None):
+        if exists(API_CONFIG_PATH):
+            with open(API_CONFIG_PATH) as f:
+                config = safe_load(f)
+                if 'profiles' in config:
+                    profiles = config['profiles']
+                    potential_profiles = [
+                        profile,
+                        getenv(ENVIRONMENT_API_PROFILE),
+                        config['current_profile'] if 'current_profile' in config else None,
+                        'default'
+                    ]
+                    for potential_profile in potential_profiles:
+                        if potential_profile is not None and potential_profile in profiles:
+                            return profiles[potential_profile]
+        return None
+
+    def login(self, key=None, secret=None, access_token=None, profile=None, api_url=None):
         """
         Login to Pureport ReST API with the specified key and secret or
         pass in a previously obtained access_token.
@@ -102,18 +148,35 @@ class Client(object):
         :param str key: the key to use for login
         :param str secret: the secret to user for login
         :param str access_token: the access token obtained externally for an API key
+        :param str profile: the pureport profile to use when using credentials from a file
+        :param str api_url: the api base url
         :returns: the obtained access_token
         :rtype: str
         :raises: .exception.ClientHttpException
         :raises: .exception.MissingAccessTokenException
         """
-        if key is not None and secret is not None:
-            return self.__session.login(key, secret)
-        elif access_token is not None:
+        file_credentials = Client.__get_file_based_credentials(profile)
+        # Update api base_url
+        base_url = API_URL
+        if api_url is not None:
+            base_url = api_url
+        elif getenv(ENVIRONMENT_API_URL) is not None:
+            base_url = getenv(ENVIRONMENT_API_URL)
+        elif file_credentials is not None and 'api_url' in file_credentials:
+            base_url = file_credentials['api_url']
+        self.__session._base_url = base_url
+        # Update auth token
+        if access_token is not None:
             self.__session.set_access_token(access_token)
             return access_token
-        else:
-            raise MissingAccessTokenException()
+        elif key is not None and secret is not None:
+            return self.__session.login(key, secret)
+        elif getenv(ENVIRONMENT_API_KEY) is not None and getenv(ENVIRONMENT_API_SECRET) is not None:
+            return self.__session.login(getenv(ENVIRONMENT_API_KEY), getenv(ENVIRONMENT_API_SECRET))
+        elif file_credentials is not None and 'api_key' in file_credentials and 'api_secret' in file_credentials:
+            return self.__session.login(file_credentials['api_key'],
+                                        file_credentials['api_secret'])
+        raise MissingAccessTokenException()
 
     @property
     def accounts(self):

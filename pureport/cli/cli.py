@@ -8,21 +8,25 @@ from .util import construct_commands, find_client_commands
 @option('-u', '--api_url', default=API_URL, help='The api url for this client.')
 @option('-k', '--api_key', help='The API Key.')
 @option('-s', '--api_secret', help='The API Key secret.')
+@option('-p', '--api_profile', help='The API Profile if using file-based configuration.')
 @option('-t', '--access_token', help='The API Key access token.')
 @version_option()
 @pass_context
-def cli(ctx, api_url, api_key, api_secret, access_token):
+def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
     """
     \f
     :param click.Context ctx:
     :param str api_url:
     :param str api_key:
     :param str api_secret:
+    :param str api_profile:
     :param str access_token:
     """
-    client = Client(base_url=api_url)
-    client.login(api_key, api_secret, access_token)
-    ctx.obj = client
+    ctx.obj = Client(base_url=api_url,
+                     key=api_key,
+                     secret=api_secret,
+                     profile=api_profile,
+                     access_token=access_token)
 
 
 commands = [
