@@ -1,11 +1,11 @@
 from click import group, option, pass_context, version_option
 
-from ..api.client import API_URL, Client
+from ..api.client import Client
 from .util import construct_commands, find_client_commands
 
 
 @group(context_settings={'auto_envvar_prefix': 'PUREPORT'})
-@option('-u', '--api_url', default=API_URL, help='The api url for this client.')
+@option('-u', '--api_url', help='The api url for this client.')
 @option('-k', '--api_key', help='The API Key.')
 @option('-s', '--api_secret', help='The API Key secret.')
 @option('-p', '--api_profile', help='The API Profile if using file-based configuration.')
