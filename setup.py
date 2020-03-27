@@ -21,7 +21,7 @@ def read_requirements(file_name):
 
 setup(
     name='pureport-client',
-    version='1.0.1',
+    version='1.0.2',
     author='Pureport',
     author_email='noreply@pureport.com',
     license='MIT',
@@ -36,6 +36,11 @@ setup(
         'pureport.util.*'
     ]),
     install_requires=read_requirements('requirements.txt'),
+    entry_points={
+        'console_scripts': [
+            'pureport=pureport.cli.cli:cli'
+        ]
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
