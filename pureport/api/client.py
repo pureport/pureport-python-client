@@ -97,9 +97,18 @@ class Client(object):
         :param str access_token: the access token obtained externally for an API key
         :param str profile: the pureport profile to use when using credentials from a file
         """
-        self.__session = PureportSession(base_url)
+        # Storing the base_url for compatibility, for usage in `login`.
+        # We used to create the client with the base_url and then login with
+        # credentials.  This `base_url` would have been "forgotten" and reverted
+        # back to using the PROD API_URL, but if we store it and use this as the default,
+        # then it works exactly as it did before.
+        self.__base_url = base_url if base_url is not None else API_URL
+        self.__session = PureportSession(self.__base_url)
         try:
-            self.login(key, secret, access_token, profile, base_url)  # Attempt login
+            # Attempt login with the parameters provided.  Unlike above,
+            # we are passing None for base_url by default to prevent cases
+            # where environment credentials are different from the passed in base_url.
+            self.login(key, secret, access_token, profile, base_url)
         except MissingAccessTokenException:
             pass
         except ClientHttpException as e:
@@ -157,13 +166,14 @@ class Client(object):
         """
         file_credentials = Client.__get_file_based_credentials(profile)
         # Update api base_url
-        base_url = API_URL
+        base_url = self.__base_url
         if api_url is not None:
             base_url = api_url
         elif getenv(ENVIRONMENT_API_URL) is not None:
             base_url = getenv(ENVIRONMENT_API_URL)
         elif file_credentials is not None and 'api_url' in file_credentials:
             base_url = file_credentials['api_url']
+        self.__base_url = base_url
         self.__session._base_url = base_url
         # Update auth token
         if access_token is not None:
