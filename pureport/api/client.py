@@ -518,7 +518,7 @@ class Client(object):
             The account supported ports client
             \f
             :param str account_id: the account id
-            :rtype: Client.AccountSupportedConnectionsClient
+            :rtype: Client.AccountSupportedPortsClient
             """
             return Client.AccountSupportedPortsClient(self.__session, account_id)
 
