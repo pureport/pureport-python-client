@@ -1,10 +1,34 @@
-from click import command, group, echo, pass_context, pass_obj, Choice, Option
+from click import command, group, echo, pass_context, pass_obj, Choice, Option, ParamType
 from functools import update_wrapper
-from json import dumps as json_dumps
+from json import dumps as json_dumps, loads as json_loads, JSONDecodeError
 from inspect import isgeneratorfunction, isfunction, ismethod
 from yaml import dump as yaml_dumps
 
 from ..exception.api import ClientHttpException
+
+
+class __JsonParamType(ParamType):
+    """
+    This is simplified and copied from
+    [click-params](https://click-params.readthedocs.io/en/latest/usage/miscellaneous/#json).
+    This was done because click-params doesn't support Python 3.5, but it's not currently EOL.
+    """
+    name = 'json'
+
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
+
+    def convert(self, value, param, ctx):
+        try:
+            return json_loads(value, **self._kwargs)
+        except JSONDecodeError:
+            self.fail('%s is not a valid json string' % value, param, ctx)
+
+    def __repr__(self):
+        return self.name.upper()
+
+
+JSON = __JsonParamType()
 
 
 def __insert_click_param(f, param):

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from click import Choice, argument, option
-from click_params import JSON
 from enum import Enum
 from logging import basicConfig, getLogger
 from os.path import exists, expanduser
 from os import getenv
 from yaml import safe_load
 
+from ..cli.util import JSON
 from ..exception.api import (
     ClientHttpException,
     ConnectionOperationFailedException,
@@ -518,7 +518,7 @@ class Client(object):
             The account supported ports client
             \f
             :param str account_id: the account id
-            :rtype: Client.AccountSupportedConnectionsClient
+            :rtype: Client.AccountSupportedPortsClient
             """
             return Client.AccountSupportedPortsClient(self.__session, account_id)
 
