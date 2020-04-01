@@ -1,5 +1,4 @@
 click
-click-params
 enum34
 requests
 PyYaml
