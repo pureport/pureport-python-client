@@ -1,7 +1,7 @@
 from click import command, group, echo, pass_context, pass_obj, Choice, Option, ParamType
 from functools import update_wrapper
 from json import dumps as json_dumps, loads as json_loads, JSONDecodeError
-from inspect import isgeneratorfunction, isfunction, ismethod
+from inspect import getfullargspec, isroutine
 from yaml import dump as yaml_dumps
 
 from ..exception.api import ClientHttpException
@@ -137,21 +137,42 @@ def __create_client_command(f):
     return command()(new_func)
 
 
+def __is_regular_method(klass_or_instance, attr):
+    """
+    Test if a value of a class is regular method.
+    https://github.com/MacHu-GWU/inspect_mate-project/blob/master/inspect_mate/tester.py#L88-L114
+    example::
+        class MyClass(object):
+            def execute(self, input_data):
+                ...
+    :param object klass_or_instance: the class
+    :param str attr: attribute name
+    """
+    value = getattr(klass_or_instance, attr)
+    if isroutine(value):
+        if isinstance(value, property):
+            return False
+        args = getfullargspec(value).args
+        try:
+            if args[0] == "self":
+                return True
+        except Exception:
+            pass
+    return False
+
+
 def find_client_commands(obj):
     """
     Given an object, this finds a list of potential commands by
     listing all public instance methods of an object.
-    Checking for a static method was derived from here,
-    https://gist.github.com/MacHu-GWU/0170849f693aa5f8d129aa03fc358305#file-inspect_mate-py-L113
     :param object obj:
     :rtype: list[function]
     """
     commands = []
     for name in dir(obj):
         if not name.startswith('_'):
-            attr = getattr(obj, name)
-            if (not isinstance(obj.__dict__[name], staticmethod) and
-               (isgeneratorfunction(attr) or isfunction(attr) or ismethod(attr))):
+            if __is_regular_method(obj, name):
+                attr = getattr(obj, name)
                 commands.append(attr)
     return commands
 
