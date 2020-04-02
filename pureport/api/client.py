@@ -85,7 +85,8 @@ class ConnectionState(Enum):
 class Client(object):
     def __init__(self, base_url=None,
                  key=None, secret=None,
-                 access_token=None, profile=None):
+                 access_token=None, profile=None,
+                 session=None):
         """
         Client for the Pureport ReST API
         This client is a thin wrapper around :module:`requests`.
@@ -96,6 +97,7 @@ class Client(object):
         :param str secret: the secret to user for login
         :param str access_token: the access token obtained externally for an API key
         :param str profile: the pureport profile to use when using credentials from a file
+        :param PureportSession session: a session variable for testing
         """
         # Storing the base_url for compatibility, for usage in `login`.
         # We used to create the client with the base_url and then login with
@@ -103,7 +105,7 @@ class Client(object):
         # back to using the PROD API_URL, but if we store it and use this as the default,
         # then it works exactly as it did before.
         self.__base_url = base_url if base_url is not None else API_URL
-        self.__session = PureportSession(self.__base_url)
+        self.__session = session if session else PureportSession(self.__base_url)
         try:
             # Attempt login with the parameters provided.  Unlike above,
             # we are passing None for base_url by default to prevent cases
@@ -187,6 +189,13 @@ class Client(object):
             return self.__session.login(file_credentials['api_key'],
                                         file_credentials['api_secret'])
         raise MissingAccessTokenException()
+
+    def open_api(self):
+        """
+        Get's the open api documentation
+        :rtype: dict
+        """
+        return self.__session.get('/openapi.json').json()
 
     @property
     def accounts(self):
@@ -935,7 +944,7 @@ class Client(object):
             :rtype: AccountMember
             :raises: .exception.HttpClientException
             """
-            return self.__session.post('%s/members' % self.__account_id, json=member).json()
+            return self.__session.post('/accounts/%s/members' % self.__account_id, json=member).json()
 
         @argument('member', type=JSON)
         def update(self, member):
@@ -1143,7 +1152,7 @@ class Client(object):
             :rtype: AccountRole
             :raises: .exception.HttpClientException
             """
-            return self.__session.put('%s/roles/%s' % (self.__account_id, role['id']), json=role).json()
+            return self.__session.put('/accounts/%s/roles/%s' % (self.__account_id, role['id']), json=role).json()
 
         @argument('role_id')
         def delete(self, role_id):
@@ -1620,7 +1629,7 @@ class Client(object):
 
         @option('-t', '--types', multiple=True,
                 help='A filter for the list of enumeration types')
-        def list(self, *types):
+        def list(self, types=None):
             """
             List all option objects provided by the API.  These are constant enumerations that are
             used for various parts of the API.  A optional set of **types** may be passed in

@@ -21,7 +21,7 @@ def read_requirements(file_name):
 
 setup(
     name='pureport-client',
-    version='1.0.4',
+    version='1.0.5',
     author='Pureport',
     author_email='noreply@pureport.com',
     license='MIT',
@@ -32,6 +32,7 @@ setup(
     packages=find_namespace_packages(include=[
         'pureport.*',
         'pureport.api.*',
+        'pureport.cli.*',
         'pureport.exception.*',
         'pureport.util.*'
     ]),

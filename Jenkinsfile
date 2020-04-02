@@ -1,11 +1,35 @@
 pipeline {
     agent { dockerfile { filename '.jenkins/Dockerfile' } }
     stages {
-        stage('Lint') {
+        stage('Test') {
             steps {
-                sh """
-                    tox
-                """
+                withCredentials([
+                    string(
+                        credentialsId: 'dev_api_url',
+                        variable: 'PUREPORT_API_URL'
+                    ),
+                    usernamePassword(
+                        credentialsId: 'dev_api_credentials',
+                        usernameVariable: 'PUREPORT_API_KEY',
+                        passwordVariable: 'PUREPORT_API_SECRET'
+                    )
+                ]) {
+                    sh """ 
+                        tox
+                    """
+                }
+            }
+            post {
+                always {
+                    publishHTML target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild : true,
+                        keepAll: true,
+                        reportDir: 'htmlcov',
+                        reportFiles: 'index.html',
+                        reportName: 'Coverage Summary'
+                    ]
+                }
             }
         }
         stage('Build') {

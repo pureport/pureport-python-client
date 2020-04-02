@@ -5,5 +5,7 @@
 .tox/
 build/
 dist/
+htmlcov/
 venv/
+.coverage
 __pycache__
