@@ -140,8 +140,9 @@ def __create_client_command(f):
 def find_client_commands(obj):
     """
     Given an object, this finds a list of potential commands by
-    listing all public attributes and returning the attributes
-    that are functions.
+    listing all public instance methods of an object.
+    Checking for a static method was derived from here,
+    https://gist.github.com/MacHu-GWU/0170849f693aa5f8d129aa03fc358305#file-inspect_mate-py-L113
     :param object obj:
     :rtype: list[function]
     """
@@ -149,7 +150,8 @@ def find_client_commands(obj):
     for name in dir(obj):
         if not name.startswith('_'):
             attr = getattr(obj, name)
-            if isgeneratorfunction(attr) or isfunction(attr) or ismethod(attr):
+            if (not isinstance(obj.__dict__[name], staticmethod) and
+               (isgeneratorfunction(attr) or isfunction(attr) or ismethod(attr))):
                 commands.append(attr)
     return commands
 
