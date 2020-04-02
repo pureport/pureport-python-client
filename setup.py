@@ -32,6 +32,7 @@ setup(
     packages=find_namespace_packages(include=[
         'pureport.*',
         'pureport.api.*',
+        'pureport.cli.*',
         'pureport.exception.*',
         'pureport.util.*'
     ]),
