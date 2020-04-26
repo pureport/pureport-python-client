@@ -85,10 +85,10 @@ pureport accounts list | jq
 
 ### List all networks for the first account
 first_account_id=$(pureport accounts list --name traynham | jq -r '.[0].id')
-pureport accounts networks $first_account_id list
+pureport accounts networks -a $first_account_id list
 
 ### Create a Network for the Account and persist it's id
-new_network_id=$(pureport accounts networks $first_account_id create '{"name": "My First Network"}' | jq -r '.id')
+new_network_id=$(pureport accounts networks -a $first_account_id create '{"name": "My First Network"}' | jq -r '.id')
 
 ### List all pureport locations
 pureport locations list | jq
@@ -97,7 +97,7 @@ pureport locations list | jq
 location_link=$(pureport locations list | jq -r '.[0] | {id: .id, href: .href, title: .name}')
 
 ### Create an AWS Connection
-new_connection_id=$(pureport networks connections $new_network_id create --wait_until_active '{
+new_connection_id=$(pureport networks connections -n $new_network_id create --wait_until_active '{
     "name": "My First AWS Connection",
     "type": "AWS_DIRECT_CONNECT",
     "speed": 50,
