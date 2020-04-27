@@ -381,7 +381,7 @@ class Client(object):
             """
             self.__session.delete('/accounts/%s' % account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def api_keys(self, account_id):
             """
             The account api keys client
@@ -391,7 +391,7 @@ class Client(object):
             """
             return Client.AccountAPIKeysClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def audit_log(self, account_id):
             """
             The account audit log client
@@ -401,7 +401,7 @@ class Client(object):
             """
             return Client.AccountAuditLogClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def billing(self, account_id):
             """
             The account billing client
@@ -411,7 +411,7 @@ class Client(object):
             """
             return Client.AccountBillingClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def connections(self, account_id):
             """
             The account connections client
@@ -421,7 +421,7 @@ class Client(object):
             """
             return Client.AccountConnectionsClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def consent(self, account_id):
             """
             The account consent client
@@ -431,7 +431,7 @@ class Client(object):
             """
             return Client.AccountConsentClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def invites(self, account_id):
             """
             The account invites client
@@ -441,7 +441,7 @@ class Client(object):
             """
             return Client.AccountInvitesClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def invoices(self, account_id):
             """
             The account invoices client
@@ -451,7 +451,7 @@ class Client(object):
             """
             return Client.AccountInvoicesClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def members(self, account_id):
             """
             The account members client
@@ -461,7 +461,7 @@ class Client(object):
             """
             return Client.AccountMembersClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def metrics(self, account_id):
             """
             The account metrics client
@@ -471,7 +471,7 @@ class Client(object):
             """
             return Client.AccountMetricsClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def networks(self, account_id):
             """
             The account networks client
@@ -481,7 +481,7 @@ class Client(object):
             """
             return Client.AccountNetworksClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def permissions(self, account_id):
             """
             The account permissions client
@@ -491,7 +491,7 @@ class Client(object):
             """
             return Client.AccountPermissionsClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def ports(self, account_id):
             """
             The account ports client
@@ -501,7 +501,7 @@ class Client(object):
             """
             return Client.AccountPortsClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def roles(self, account_id):
             """
             The account roles client
@@ -511,7 +511,7 @@ class Client(object):
             """
             return Client.AccountRolesClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def supported_connections(self, account_id):
             """
             The account supported connections client
@@ -521,7 +521,7 @@ class Client(object):
             """
             return Client.AccountSupportedConnectionsClient(self.__session, account_id)
 
-        @argument('account_id')
+        @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
         def supported_ports(self, account_id):
             """
             The account supported ports client
@@ -1565,7 +1565,7 @@ class Client(object):
             """
             self.__session.delete('/networks/%s' % network_id)
 
-        @argument('network_id')
+        @option('-n', '--network_id', envvar='PUREPORT_NETWORK_ID', required=True)
         def connections(self, network_id):
             """
             Get the account network connections client using the provided account.

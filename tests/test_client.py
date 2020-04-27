@@ -3,6 +3,7 @@ from click.testing import CliRunner
 from requests_mock import Adapter
 from re import compile, sub
 from unittest import TestCase
+from os import environ
 
 from pureport.api.client import Client
 from pureport.cli.cli import commands
@@ -95,195 +96,277 @@ class TestAccountsClient(TestCase):
 class TestAccountApiKeysClient(TestCase):
     def test_list(self):
         client.accounts.api_keys('123').list()
-        test_command('accounts', 'api-keys', '123', 'list')
+        test_command('accounts', 'api-keys', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'api-keys', 'list')
 
     def test_get(self):
         client.accounts.api_keys('123').get('123')
-        test_command('accounts', 'api-keys', '123', 'get', '123')
+        test_command('accounts', 'api-keys', '-a', '123', 'get', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'api-keys', 'get', '123')
 
     def test_create(self):
         client.accounts.api_keys('123').create({'key': '123'})
-        test_command('accounts', 'api-keys', '123', 'create', '{"key": "123"}')
+        test_command('accounts', 'api-keys', '-a', '123', 'create', '{"key": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'api-keys', 'create', '{"key": "123"}')
 
     def test_update(self):
         client.accounts.api_keys('123').update({'key': '123'})
-        test_command('accounts', 'api-keys', '123', 'update', '{"key": "123"}')
+        test_command('accounts', 'api-keys', '-a', '123', 'update', '{"key": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'api-keys', 'update', '{"key": "123"}')
 
     def test_delete(self):
         client.accounts.api_keys('123').delete('123')
-        test_command('accounts', 'api-keys', '123', 'delete', '123')
+        test_command('accounts', 'api-keys', '-a', '123', 'delete', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'api-keys', 'delete', '123')
 
 
 class TestAccountAuditLogClient(TestCase):
     def test_query(self):
         client.accounts.audit_log('123').query()
-        test_command('accounts', 'audit-log', '123', 'query')
+        test_command('accounts', 'audit-log', '-a', '123', 'query')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'audit-log', 'query')
 
 
 class TestAccountBillingClient(TestCase):
     def test_get(self):
         client.accounts.billing('123').get()
-        test_command('accounts', 'billing', '123', 'get')
+        test_command('accounts', 'billing', '-a', '123', 'get')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'billing', 'get')
 
     def test_get_configured(self):
         client.accounts.billing('123').get_configured()
-        test_command('accounts', 'billing', '123', 'get-configured')
+        test_command('accounts', 'billing', '-a', '123', 'get-configured')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'billing', 'get-configured')
 
     def test_create(self):
         client.accounts.billing('123').create({})
-        test_command('accounts', 'billing', '123', 'create', '{}')
+        test_command('accounts', 'billing', '-a', '123', 'create', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'billing', 'create', '{}')
 
     def test_update(self):
         client.accounts.billing('123').update({})
-        test_command('accounts', 'billing', '123', 'update', '{}')
+        test_command('accounts', 'billing', '-a', '123', 'update', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'billing', 'update', '{}')
 
     def test_delete(self):
         client.accounts.billing('123').delete()
-        test_command('accounts', 'billing', '123', 'delete')
+        test_command('accounts', 'billing', '-a', '123', 'delete')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'billing', 'delete')
 
 
 class TestAccountConnectionsClient(TestCase):
     def test_list(self):
         client.accounts.connections('123').list()
-        test_command('accounts', 'connections', '123', 'list')
+        test_command('accounts', 'connections', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'connections', 'list')
 
 
 class TestAccountConsentClient(TestCase):
     def test_get(self):
         client.accounts.consent('123').get()
-        test_command('accounts', 'consent', '123', 'get')
+        test_command('accounts', 'consent', '-a', '123', 'get')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'consent', 'get')
 
     def test_accept(self):
         client.accounts.consent('123').accept()
-        test_command('accounts', 'consent', '123', 'accept')
+        test_command('accounts', 'consent', '-a', '123', 'accept')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'consent', 'accept')
 
 
 class TestAccountInvitesClient(TestCase):
     def test_list(self):
         client.accounts.invites('123').list()
-        test_command('accounts', 'invites', '123', 'list')
+        test_command('accounts', 'invites', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invites', 'list')
 
     def test_get(self):
         client.accounts.invites('123').get('123')
-        test_command('accounts', 'invites', '123', 'get', '123')
+        test_command('accounts', 'invites', '-a', '123', 'get', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invites', 'get', '123')
 
     def test_create(self):
         client.accounts.invites('123').create({'id': '123'})
-        test_command('accounts', 'invites', '123', 'create', '{"id": "123"}')
+        test_command('accounts', 'invites', '-a', '123', 'create', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invites', 'create', '{"id": "123"}')
 
     def test_update(self):
         client.accounts.invites('123').update({'id': '123'})
-        test_command('accounts', 'invites', '123', 'update', '{"id": "123"}')
+        test_command('accounts', 'invites', '-a', '123', 'update', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invites', 'update', '{"id": "123"}')
 
     def test_delete(self):
         client.accounts.invites('123').delete('123')
-        test_command('accounts', 'invites', '123', 'delete', '123')
+        test_command('accounts', 'invites', '-a', '123', 'delete', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invites', 'delete', '123')
 
 
 class TestAccountInvoicesClient(TestCase):
     def test_list(self):
         client.accounts.invoices('123').list({})
-        test_command('accounts', 'invoices', '123', 'list', "{}")
+        test_command('accounts', 'invoices', '-a', '123', 'list', "{}")
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invoices', 'list', "{}")
 
     def test_list_upcoming(self):
         client.accounts.invoices('123').list_upcoming()
-        test_command('accounts', 'invoices', '123', 'list-upcoming')
+        test_command('accounts', 'invoices', '-a', '123', 'list-upcoming')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'invoices', 'list-upcoming')
 
 
 class TestAccountMembersClient(TestCase):
     def test_list(self):
         client.accounts.members('123').list()
-        test_command('accounts', 'members', '123', 'list')
+        test_command('accounts', 'members', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'members', 'list')
 
     def test_get(self):
         client.accounts.members('123').get('123')
-        test_command('accounts', 'members', '123', 'get', '123')
+        test_command('accounts', 'members', '-a', '123', 'get', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'members', 'get', '123')
 
     def test_create(self):
         client.accounts.members('123').create({'user': {'id': '123'}})
-        test_command('accounts', 'members', '123', 'create', '{"id": "123"}')
+        test_command('accounts', 'members', '-a', '123', 'create', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'members', 'create', '{"id": "123"}')
 
     def test_update(self):
         client.accounts.members('123').update({'user': {'id': '123'}})
-        test_command('accounts', 'members', '123', 'get', '{"id": "123"}')
+        test_command('accounts', 'members', '-a', '123', 'get', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'members', 'get', '{"id": "123"}')
 
     def test_delete(self):
         client.accounts.members('123').delete('123')
-        test_command('accounts', 'members', '123', 'delete', '123')
+        test_command('accounts', 'members', '-a', '123', 'delete', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'members', 'delete', '123')
 
 
 class TestAccountMetricsClient(TestCase):
     def test_usage_by_connection(self):
         client.accounts.metrics('123').usage_by_connection({})
-        test_command('accounts', 'metrics', '123', 'usage-by-connection', '{}')
+        test_command('accounts', 'metrics', '-a', '123', 'usage-by-connection', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'metrics', 'usage-by-connection', '{}')
 
     def test_usage_by_connection_and_time(self):
         client.accounts.metrics('123').usage_by_connection_and_time({})
-        test_command('accounts', 'metrics', '123', 'usage-by-connection-and-time', '{}')
+        test_command('accounts', 'metrics', '-a', '123', 'usage-by-connection-and-time', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'metrics', 'usage-by-connection-and-time', '{}')
 
     def test_usage_by_network_and_time(self):
         client.accounts.metrics('123').usage_by_network_and_time({})
-        test_command('accounts', 'metrics', '123', 'usage-by-network-and-time', '{}')
+        test_command('accounts', 'metrics', '-a', '123', 'usage-by-network-and-time', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'metrics', 'usage-by-network-and-time', '{}')
 
 
 class TestAccountNetworksClient(TestCase):
     def test_list(self):
         client.accounts.networks('123').list()
-        test_command('accounts', 'networks', '123', 'list')
+        test_command('accounts', 'networks', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'networks', 'list')
 
     def test_create(self):
         client.accounts.networks('123').create({})
-        test_command('accounts', 'networks', '123', 'create', '{}')
+        test_command('accounts', 'networks', '-a', '123', 'create', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'networks', 'create', '{}')
 
 
 class TestAccountPermissionsClient(TestCase):
     def test_get(self):
         client.accounts.permissions('123').get()
-        test_command('accounts', 'permissions', '123', 'get')
+        test_command('accounts', 'permissions', '-a', '123', 'get')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'permissions', 'get')
 
 
 class TestAccountPortsClient(TestCase):
     def test_list(self):
         client.accounts.ports('123').list()
-        test_command('accounts', 'ports', '123', 'list')
+        test_command('accounts', 'ports', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'ports', 'list')
 
     def test_create(self):
         client.accounts.ports('123').create({})
-        test_command('accounts', 'ports', '123', 'create', '{}')
+        test_command('accounts', 'ports', '-a', '123', 'create', '{}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'ports', 'create', '{}')
 
 
 class TestAccountRolesClient(TestCase):
     def test_list(self):
         client.accounts.roles('123').list()
-        test_command('accounts', 'roles', '123', 'list')
+        test_command('accounts', 'roles', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'roles', 'list')
 
     def test_get(self):
         client.accounts.roles('123').get('123')
-        test_command('accounts', 'roles', '123', 'get', '123')
+        test_command('accounts', 'roles', '-a', '123', 'get', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'roles', 'get', '123')
 
     def test_create(self):
         client.accounts.roles('123').create({'id': '123'})
-        test_command('accounts', 'roles', '123', 'create', '{"id": "123"}')
+        test_command('accounts', 'roles', '-a', '123', 'create', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'roles', 'create', '{"id": "123"}')
 
     def test_update(self):
         client.accounts.roles('123').update({'id': '123'})
-        test_command('accounts', 'roles', '123', 'update', '{"id": "123"}')
+        test_command('accounts', 'roles', '-a', '123', 'update', '{"id": "123"}')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'roles', 'update', '{"id": "123"}')
 
     def test_delete(self):
         client.accounts.roles('123').delete('123')
-        test_command('accounts', 'roles', '123', 'get', '123')
+        test_command('accounts', 'roles', '-a', '123', 'get', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'roles', 'get', '123')
 
 
 class TestAccountSupportedConnectionsClient(TestCase):
     def test_list(self):
         client.accounts.supported_connections('123').list()
-        test_command('accounts', 'supported-connections', '123', 'list')
+        test_command('accounts', 'supported-connections', '-a', '123', 'list')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'supported-connections', 'list')
 
 
 class TestAccountSupportedPortsClient(TestCase):
     def test_list(self):
         client.accounts.supported_ports('123').list('123')
-        test_command('accounts', 'supported-ports', '123', 'list', '123')
+        test_command('accounts', 'supported-ports', '-a', '123', 'list', '123')
+        environ['PUREPORT_ACCOUNT_ID'] = '123'
+        test_command('accounts', 'supported-ports', 'list', '123')
 
 
 class TestCloudRegionsClient(TestCase):
@@ -391,11 +474,15 @@ class TestNetworksClient(TestCase):
 class TestNetworkConnectionsClient(TestCase):
     def test_get(self):
         client.networks.connections('123').list()
-        test_command('networks', 'connections', '123', 'list')
+        test_command('networks', 'connections', '-n', '123', 'list')
+        environ['PUREPORT_NETWORK_ID'] = '123'
+        test_command('networks', 'connections', 'list')
 
     def test_create(self):
         client.networks.connections('123').create({})
-        test_command('networks', 'connections', '123', 'create', '{}')
+        test_command('networks', 'connections', '-n', '123', 'create', '{}')
+        environ['PUREPORT_NETWORK_ID'] = '123'
+        test_command('networks', 'connections', 'create', '{}')
 
 
 class TestOptionsClient(TestCase):
