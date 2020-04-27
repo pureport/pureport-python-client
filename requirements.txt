@@ -1,4 +1,3 @@
 click
-enum34
 requests
 PyYaml
