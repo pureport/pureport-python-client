@@ -15,6 +15,7 @@ from ..exception.api import (
     NotFoundException
 )
 from ..util.api import PureportSession
+from ..util.date import format_date
 from ..util.decorators import retry
 
 __docformat__ = 'reStructuredText'
@@ -640,7 +641,7 @@ class Client(object):
                                                      'NOTIFICATION_DELETE', 'TASK_CREATE',
                                                      'TASK_UPDATE', 'TASK_DELETE']),
                 help='Limit the results to particular event types.')
-        @option('-r', '--result', type=Choice(['true', 'false']),
+        @option('-r', '--result', type=Choice(['SUCCESS', 'FAILURE']),
                 help='If the result was successful or not.')
         @option('-pi', '--principal_id',
                 help='The principal id, e.g. user or api key id.')
@@ -685,8 +686,8 @@ class Client(object):
                     'pageSize': page_size,
                     'sort': sort,
                     'sortDirection': sort_direction,
-                    'startTime': start_time,
-                    'endTime': end_time,
+                    'startTime': format_date(start_time),
+                    'endTime': format_date(end_time),
                     'includeChildAccounts': include_child_accounts,
                     'eventTypes': event_types,
                     'result': result,
