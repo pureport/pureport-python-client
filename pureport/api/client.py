@@ -1723,15 +1723,24 @@ class Client(object):
         @option('-s', '--state',
                 type=Choice(['CREATED', 'RUNNING', 'COMPLETED', 'FAILED', 'DELETED']),
                 help='The task state.')
-        def list(self, state=None):
+        @option('-pn', '--page_number', type=int, help='The page number for pagination.')
+        @option('-ps', '--page_size', type=int, help='The page size for pagination.')
+        def list(self, state=None, page_number=None, page_size=None):
             """
             List all tasks.
             \f
             :param str state: find all tasks for a particular state
-            :rtype: list[Task]
+            :param int page_number: page number for pagination
+            :param int page_size: page size for pagination
+            :rtype: Page[Task]
             :raises: .exception.HttpClientException
             """
-            return self.__session.get('/tasks', params={'state': state}).json()
+            return self.__session.get('/tasks',
+                                      params={
+                                          'state': state,
+                                          'pageNumber': page_number,
+                                          'pageSize': page_size
+                                      }).json()
 
         @argument('task_id')
         def get(self, task_id):
