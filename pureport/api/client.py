@@ -69,6 +69,27 @@ UsageByConnectionOptions = dict
 UsageByNetworkAndTimeOptions = dict
 
 
+def paginate(client_fun, *args, **kwargs):
+    """
+    Given a client function that supports the page_size and page_number
+    keyword arguments for pagination, this generator will yield all results
+    from that function.
+    :param function client_fun:
+    :rtype: Iterator
+    """
+    resp = client_fun(*args, **kwargs)
+    yield from resp['content']
+    total_elements = resp['totalElements']
+    page_size = resp['pageSize']
+    page_number = resp['pageNumber'] + 1
+    if 'page_number' in kwargs:
+        kwargs.pop('page_number')
+    while page_number * page_size < total_elements:
+        resp = client_fun(*args, page_number=page_number, **kwargs)
+        yield from resp['content']
+        page_number = resp['pageNumber'] + 1
+
+
 class ConnectionState(Enum):
     INITIALIZING = "INITIALIZING"
     WAITING_TO_PROVISION = "WAITING_TO_PROVISION"
@@ -1723,15 +1744,24 @@ class Client(object):
         @option('-s', '--state',
                 type=Choice(['CREATED', 'RUNNING', 'COMPLETED', 'FAILED', 'DELETED']),
                 help='The task state.')
-        def list(self, state=None):
+        @option('-pn', '--page_number', type=int, help='The page number for pagination.')
+        @option('-ps', '--page_size', type=int, help='The page size for pagination.')
+        def list(self, state=None, page_number=None, page_size=None):
             """
             List all tasks.
             \f
             :param str state: find all tasks for a particular state
-            :rtype: list[Task]
+            :param int page_number: page number for pagination
+            :param int page_size: page size for pagination
+            :rtype: Page[Task]
             :raises: .exception.HttpClientException
             """
-            return self.__session.get('/tasks', params={'state': state}).json()
+            return self.__session.get('/tasks',
+                                      params={
+                                          'state': state,
+                                          'pageNumber': page_number,
+                                          'pageSize': page_size
+                                      }).json()
 
         @argument('task_id')
         def get(self, task_id):
