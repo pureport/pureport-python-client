@@ -21,7 +21,7 @@ def read_requirements(file_name):
 
 setup(
     name='pureport-client',
-    version='1.0.8',
+    version='1.0.9',
     author='Pureport',
     author_email='noreply@pureport.com',
     license='MIT',
