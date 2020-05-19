@@ -5,7 +5,7 @@ from re import compile, sub
 from unittest import TestCase
 from os import environ
 
-from pureport.api.client import Client
+from pureport.api.client import Client, paginate
 from pureport.cli.cli import commands
 from pureport.cli.util import construct_commands
 from pureport.util.api import PureportSession
@@ -69,6 +69,25 @@ cli = __create_mock_cli(client)
 def test_command(*args):
     result = runner.invoke(cli, args=args)
     assert result.exit_code == 0
+
+
+class TestPaginate(TestCase):
+    @staticmethod
+    def __client_fun(page_number=0, page_size=100):
+        return {
+            'totalElements': 42,
+            'pageSize': page_size,
+            'pageNumber': page_number,
+            'content': ['a']
+        }
+
+    def test_paginate(self):
+        results = list(paginate(TestPaginate.__client_fun, page_size=4))
+        assert len(results) == 11
+        results = list(paginate(TestPaginate.__client_fun, page_size=43))
+        assert len(results) == 1
+        results = list(paginate(TestPaginate.__client_fun, page_size=4, page_number=1))
+        assert len(results) == 10
 
 
 class TestAccountsClient(TestCase):
