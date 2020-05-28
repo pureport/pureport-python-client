@@ -1733,15 +1733,6 @@ class Client(object):
             """
             return self.__session.get('/supportedConnections/%s' % supported_connection_id).json()
 
-        def list(self):
-            """
-            Get all supported connections.
-            \f
-            :rtype: list[SupportedConnection]
-            :raises: .exception.HttpClientException
-            """
-            return self.__session.get('/supportedConnections').json()
-
     class TasksClient(object):
         def __init__(self, session):
             """
