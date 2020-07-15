@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 from click import Choice, argument, option
 from enum import Enum
 from logging import basicConfig, getLogger
-from os.path import exists, expanduser
 from os import getenv
 from yaml import safe_load
 
@@ -24,7 +24,7 @@ basicConfig()
 logger = getLogger('pureport.api.client')
 
 API_URL = "https://api.pureport.com"
-API_CONFIG_PATH = expanduser('~/.pureport/credentials.yml')
+API_CONFIG_PATH = os.path.expanduser('~/.pureport')
 ENVIRONMENT_API_URL = 'PUREPORT_API_URL'
 ENVIRONMENT_API_KEY = 'PUREPORT_API_KEY'
 ENVIRONMENT_API_SECRET = 'PUREPORT_API_SECRET'
@@ -156,22 +156,42 @@ class Client(object):
         }
 
     @staticmethod
-    def __get_file_based_credentials(profile=None):
-        if exists(API_CONFIG_PATH):
-            with open(API_CONFIG_PATH) as f:
-                config = safe_load(f)
-                if 'profiles' in config:
-                    profiles = config['profiles']
-                    potential_profiles = [
-                        profile,
-                        getenv(ENVIRONMENT_API_PROFILE),
-                        config['current_profile'] if 'current_profile' in config else None,
-                        'default'
-                    ]
-                    for potential_profile in potential_profiles:
-                        if potential_profile is not None and potential_profile in profiles:
-                            return profiles[potential_profile]
-        return None
+    def _get_file_based_credentials(profile=None):
+        """ attempts to load api credentials from a well known file
+
+        This method will try to load the credentials from a the well
+        known file location ~/.pureport/credentials.[yml, yaml, json].
+        If the file exists more than once with different extensions, the
+        first one found wins.  If the file does not exist, this function
+        simply returns None.
+
+        :param profile: the name of the profile to load from the
+            credentials file
+        :param type: str
+
+        :returns: the profile loaded from the credentials file or None if the
+            file does not exist
+        :rtype: dict
+        """
+        for ext in ('yml', 'yaml', 'json'):
+            fp = os.path.join(API_CONFIG_PATH, 'credentials.{}'.format(ext))
+            try:
+                with open(fp, 'r') as f:
+                    logger.debug("Loaded profile from: {}".format(fp))
+                    config = safe_load(f)
+                    if 'profiles' in config:
+                        profiles = config['profiles']
+                        potential_profiles = [
+                            profile,
+                            getenv(ENVIRONMENT_API_PROFILE),
+                            config.get('current_profile'),
+                            'default'
+                        ]
+                        for potential_profile in potential_profiles:
+                            if potential_profile is not None and potential_profile in profiles:
+                                return profiles[potential_profile]
+            except FileNotFoundError:
+                pass
 
     def login(self, key=None, secret=None, access_token=None, profile=None, api_url=None):
         """
@@ -188,7 +208,7 @@ class Client(object):
         :raises: .exception.ClientHttpException
         :raises: .exception.MissingAccessTokenException
         """
-        file_credentials = Client.__get_file_based_credentials(profile)
+        file_credentials = Client._get_file_based_credentials(profile)
         # Update api base_url
         base_url = self.__base_url
         if api_url is not None:

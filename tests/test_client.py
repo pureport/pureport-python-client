@@ -5,6 +5,17 @@ from re import compile, sub
 from unittest import TestCase
 from os import environ
 
+import os
+import json
+import string
+import random
+import tempfile
+import shutil
+
+from contextlib import contextmanager
+
+import pureport
+
 from pureport.api.client import Client, paginate
 from pureport.cli.cli import commands
 from pureport.cli.util import construct_commands
@@ -64,6 +75,20 @@ def __create_mock_cli(pureport_client):
 client = __create_mock_client()
 runner = CliRunner()
 cli = __create_mock_cli(client)
+
+
+def random_string():
+    return ''.join(random.choice(string.ascii_uppercase + string.digits)
+                   for _ in range(random.randint(3, 20)))
+
+
+@contextmanager
+def tempdir():
+    try:
+        tmpdir = tempfile.mkdtemp()
+        yield tmpdir
+    finally:
+        shutil.rmtree(tmpdir)
 
 
 def test_command(*args):
@@ -546,3 +571,69 @@ class TestTasksClient(TestCase):
     def test_get(self):
         client.tasks.get('123')
         test_command('tasks', 'get', '123')
+
+
+class TestLoadCredentials(TestCase):
+
+    def test_profile(self):
+        api_key = random_string()
+        api_secret = random_string()
+
+        creds = {
+            'current_profile': 'test',
+            'profiles': {
+                'test': {
+                    'api_key': api_key,
+                    'api_secret': api_secret
+                }
+            }
+        }
+
+        with tempdir() as tmpdir:
+            with open(os.path.join(tmpdir, 'credentials.json'), 'w') as f:
+                f.write(json.dumps(creds))
+
+            old_path = pureport.api.client.API_CONFIG_PATH
+            pureport.api.client.API_CONFIG_PATH = tmpdir
+            data = Client._get_file_based_credentials()
+            pureport.api.client.API_CONFIG_PATH = old_path
+
+            assert data is not None
+
+            assert data['api_key'] == api_key
+            assert data['api_secret'] == api_secret
+
+    def test_default_profile(self):
+        api_key = random_string()
+        api_secret = random_string()
+
+        creds = {
+            'profiles': {
+                'default': {
+                    'api_key': api_key,
+                    'api_secret': api_secret
+                }
+            }
+        }
+
+        with tempdir() as tmpdir:
+            with open(os.path.join(tmpdir, 'credentials.json'), 'w') as f:
+                f.write(json.dumps(creds))
+
+            old_path = pureport.api.client.API_CONFIG_PATH
+            pureport.api.client.API_CONFIG_PATH = tmpdir
+            data = Client._get_file_based_credentials()
+            pureport.api.client.API_CONFIG_PATH = old_path
+
+            assert data is not None
+
+            assert data['api_key'] == api_key
+            assert data['api_secret'] == api_secret
+
+    def test_no_file(self):
+        with tempdir() as tmpdir:
+            old_path = pureport.api.client.API_CONFIG_PATH
+            pureport.api.client.API_CONFIG_PATH = tmpdir
+            data = Client._get_file_based_credentials()
+            pureport.api.client.API_CONFIG_PATH = old_path
+            assert data is None
