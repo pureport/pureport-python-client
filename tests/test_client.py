@@ -589,19 +589,21 @@ class TestLoadCredentials(TestCase):
             }
         }
 
-        with tempdir() as tmpdir:
-            with open(os.path.join(tmpdir, 'credentials.json'), 'w') as f:
-                f.write(json.dumps(creds))
+        for ext in ('yml', 'yaml', 'json'):
+            with tempdir() as tmpdir:
+                filename = 'credentials.{}'.format(ext)
+                with open(os.path.join(tmpdir, filename), 'w') as f:
+                    f.write(json.dumps(creds))
 
-            old_path = pureport.api.client.API_CONFIG_PATH
-            pureport.api.client.API_CONFIG_PATH = tmpdir
-            data = Client._get_file_based_credentials()
-            pureport.api.client.API_CONFIG_PATH = old_path
+                old_path = pureport.api.client.API_CONFIG_PATH
+                pureport.api.client.API_CONFIG_PATH = tmpdir
+                data = Client._get_file_based_credentials()
+                pureport.api.client.API_CONFIG_PATH = old_path
 
-            assert data is not None
+                assert data is not None
 
-            assert data['api_key'] == api_key
-            assert data['api_secret'] == api_secret
+                assert data['api_key'] == api_key
+                assert data['api_secret'] == api_secret
 
     def test_default_profile(self):
         api_key = random_string()
