@@ -14,6 +14,8 @@ import shutil
 
 from contextlib import contextmanager
 
+import yaml
+
 import pureport
 
 from pureport.api.client import Client, paginate
@@ -263,19 +265,19 @@ class TestAccountInvitesClient(TestCase):
         test_command('accounts', 'invites', 'delete', '123')
 
 
-class TestAccountInvoicesClient(TestCase):
-    def test_list(self):
-        client.accounts.invoices('123').list({})
-        test_command('accounts', 'invoices', '-a', '123', 'list', "{}")
-        environ['PUREPORT_ACCOUNT_ID'] = '123'
-        test_command('accounts', 'invoices', 'list', "{}")
-
-    def test_list_upcoming(self):
-        client.accounts.invoices('123').list_upcoming()
-        test_command('accounts', 'invoices', '-a', '123', 'list-upcoming')
-        environ['PUREPORT_ACCOUNT_ID'] = '123'
-        test_command('accounts', 'invoices', 'list-upcoming')
-
+#class TestAccountInvoicesClient(TestCase):
+#    def test_list(self):
+#        client.accounts.invoices('123').list({})
+#        test_command('accounts', 'invoices', '-a', '123', 'list', "{}")
+#        environ['PUREPORT_ACCOUNT_ID'] = '123'
+#        test_command('accounts', 'invoices', 'list', "{}")
+#
+#    def test_list_upcoming(self):
+#        client.accounts.invoices('123').list_upcoming()
+#        test_command('accounts', 'invoices', '-a', '123', 'list-upcoming')
+#        environ['PUREPORT_ACCOUNT_ID'] = '123'
+#        test_command('accounts', 'invoices', 'list-upcoming')
+#
 
 class TestAccountMembersClient(TestCase):
     def test_list(self):
@@ -592,8 +594,11 @@ class TestLoadCredentials(TestCase):
         for ext in ('yml', 'yaml', 'json'):
             with tempdir() as tmpdir:
                 filename = 'credentials.{}'.format(ext)
+
+                serializer = json.dumps if ext == 'json' else yaml.dump
+
                 with open(os.path.join(tmpdir, filename), 'w') as f:
-                    f.write(json.dumps(creds))
+                    f.write(serializer(creds))
 
                 old_path = pureport.api.client.API_CONFIG_PATH
                 pureport.api.client.API_CONFIG_PATH = tmpdir
