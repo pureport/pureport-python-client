@@ -9,3 +9,4 @@ htmlcov/
 venv/
 .coverage
 __pycache__
+.venv/
