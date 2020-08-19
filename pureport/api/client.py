@@ -676,10 +676,12 @@ class Client(object):
                                                       'NOTIFICATION', 'ACCOUNT_INVITE', 'ACCOUNT_BILLING',
                                                       'PORT', 'ACCOUNT_MEMBER', 'TASK']),
                 help='The subject type')
+        @option('-ics', '--include_child_subjects', is_flag=True,
+                help='If the results should include entries from child subjects from the subject id.')
         def query(self, page_number=None, page_size=None, sort=None, sort_direction=None,
                   start_time=None, end_time=None, include_child_accounts=None, event_types=None,
                   result=None, principal_id=None, ip_address=None, correlation_id=None, subject_id=None,
-                  subject_type=None):
+                  subject_type=None, include_child_subjects=None):
             """
             Query the audit log for this account.
             \f
@@ -697,6 +699,7 @@ class Client(object):
             :param str correlation_id:
             :param str subject_id:
             :param str subject_type:
+            :param bool include_child_subjects:
             :rtype: Page[AuditEntry]
             :raises: .exception.HttpClientException
             """
@@ -716,7 +719,8 @@ class Client(object):
                     'ipAddress': ip_address,
                     'correlationId': correlation_id,
                     'subjectId': subject_id,
-                    'subjectType': subject_type
+                    'subjectType': subject_type,
+                    'includeChildSubjects': include_child_subjects
                 }
             ).json()
 
@@ -1732,15 +1736,6 @@ class Client(object):
             :raises: .exception.HttpClientException
             """
             return self.__session.get('/supportedConnections/%s' % supported_connection_id).json()
-
-        def list(self):
-            """
-            Get all supported connections.
-            \f
-            :rtype: list[SupportedConnection]
-            :raises: .exception.HttpClientException
-            """
-            return self.__session.get('/supportedConnections').json()
 
     class TasksClient(object):
         def __init__(self, session):
