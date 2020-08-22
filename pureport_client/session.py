@@ -1,10 +1,15 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*_
+#
+# Copyright (c) 2020, Pureport, Inc.
+# All Rights Reserved
+
+from __future__ import absolute_import
+
 import time
+
 from requests import Session
 
-from ..exception.api import raise_response_exception
-
-__docformat__ = 'reStructuredText'
+from pureport_client.exceptions import raise_response_exception
 
 
 class RelativeSession(Session):

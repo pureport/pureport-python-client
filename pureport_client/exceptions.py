@@ -1,7 +1,12 @@
-# -*- coding: utf-8 -*-
-from requests import HTTPError
 
-__docformat__ = 'reStructuredText'
+# -*- coding: utf-8 -*_
+#
+# Copyright (c) 2020, Pureport, Inc.
+# All Rights Reserved
+
+from __future__ import absolute_import
+
+from requests import HTTPError
 
 
 class MissingAccessTokenException(IOError):

@@ -8,8 +8,10 @@ coverage = "*"
 flake8 = "*"
 pylint = "*"
 requests-mock = "*"
+pytest = "*"
 
 [packages]
 click = "*"
 requests = "*"
 PyYAML = "*"
+tox = "*"

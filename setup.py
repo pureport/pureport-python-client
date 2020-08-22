@@ -62,7 +62,7 @@ def main():
         python_requires="!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4",
         entry_points={
             'console_scripts': [
-                'pureport=pureport_client.cli.cli:cli'
+                'pureport=pureport_client.__main__:cli'
             ]
         },
     )
