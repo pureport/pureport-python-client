@@ -1,24 +1,46 @@
-# -*- coding: utf-8 -*-
-from click import Choice, argument, option
-from enum import Enum
-from logging import basicConfig, getLogger
-from os.path import exists, expanduser
+# -*- coding: utf-8 -*_
+#
+# Copyright (c) 2020, Pureport, Inc.
+# All Rights Reserved
+
+from __future__ import absolute_import
+
 from os import getenv
+from os.path import (
+    exists,
+    expanduser
+)
+
+from enum import Enum
+
+from logging import (
+    basicConfig,
+    getLogger
+)
+
 from yaml import safe_load
 
-from ..cli.util import JSON
-from ..exception.api import (
+from click import (
+    Choice,
+    argument,
+    option
+)
+
+from pureport_client.util import JSON
+
+from pureport_client.exceptions import (
     ClientHttpException,
     ConnectionOperationFailedException,
     ConnectionOperationTimeoutException,
     MissingAccessTokenException,
     NotFoundException
 )
-from ..util.api import PureportSession
-from ..util.date import format_date
-from ..util.decorators import retry
 
-__docformat__ = 'reStructuredText'
+from pureport_client.session import PureportSession
+from pureport_client.helpers import (
+    format_date,
+    retry
+)
 
 basicConfig()
 logger = getLogger('pureport.api.client')

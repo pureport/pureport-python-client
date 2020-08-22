@@ -1,7 +1,23 @@
-from click import group, option, pass_context, version_option
+# -*- coding: utf-8 -*_
+#
+# Copyright (c) 2020, Pureport, Inc.
+# All Rights Reserved
 
-from ..api.client import Client
-from .util import construct_commands, find_client_commands
+from __future__ import absolute_import
+
+from click import (
+    group,
+    option,
+    pass_context,
+    version_option
+)
+
+from pureport_client.client import Client
+
+from pureport_client.util import (
+    construct_commands,
+    find_client_commands
+)
 
 
 @group(context_settings={'auto_envvar_prefix': 'PUREPORT'})
