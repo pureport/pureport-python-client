@@ -67,7 +67,6 @@ class PureportSession(RelativeSession, RaiseForStatusSession):
         self.set_access_token(result['access_token'])
         self._refresh_token = result['refresh_token']
         self._token_expire_time = time.time() + result['expires_in']
-
         return self._access_token
 
     def set_access_token(self, access_token):
