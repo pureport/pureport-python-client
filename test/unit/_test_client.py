@@ -1,14 +1,23 @@
+# -*- coding: utf-8 -*_
+#
+# Copyright (c) 2020, Pureport, Inc.
+# All Rights Reserved
+
+from __future__ import absolute_import
+
+from re import compile, sub
+from os import environ
+from unittest import TestCase
+
 from click import group, pass_context, version_option
 from click.testing import CliRunner
-from requests_mock import Adapter
-from re import compile, sub
-from unittest import TestCase
-from os import environ
 
-from pureport.api.client import Client, paginate
-from pureport.cli.cli import commands
-from pureport.cli.util import construct_commands
-from pureport.util.api import PureportSession
+from requests_mock import Adapter
+
+from pureport_client.__main__ import commands
+from pureport_client.client import Client, paginate
+from pureport_client.util import construct_commands
+from pureport_client.session import PureportSession
 
 
 def __create_mock_client():

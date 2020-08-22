@@ -9,9 +9,9 @@ flake8 = "*"
 pylint = "*"
 requests-mock = "*"
 pytest = "*"
+tox = "*"
 
 [packages]
 click = "*"
 requests = "*"
 PyYAML = "*"
-tox = "*"
