@@ -1,49 +1,71 @@
-# -*- coding: utf-8 -*-
-from setuptools import setup, find_namespace_packages
+#!/usr/bin/env python
+
+# Copyright (c) 2020, Pureport, Inc
+# All Rights Reserved.
+
+import os
+
+from setuptools import setup
+from setuptools import find_packages
+
+from pureport_client import __version__
+from pureport_client import __author__
 
 
-def read_file(file_name):
-    """Read file and return its contents."""
-    with open(file_name, 'r') as f:
-        return f.read()
+def main():
+    base_path = os.path.dirname(__file__)
+
+    with open(os.path.join(base_path, 'README.md')) as f:
+        long_description = f.read()
+
+    with open(os.path.join(base_path, 'requirements.txt')) as f:
+        requirements = f.readlines()
 
 
-def read_requirements(file_name):
-    """Read requirements file as a list."""
-    reqs = read_file(file_name).splitlines()
-    if not reqs:
-        raise RuntimeError(
-            "Unable to read requirements from the %s file"
-            % file_name
-        )
-    return reqs
+    setup(
+        name="pureport-client",
+        version=__version__,
+        description="Pureport client command line interface",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        classifiers=[
+            "Environment :: Web Environment",
+            "intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.5",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: Implementation :: CPython",
+            "Programming Language :: Python :: Implementation :: PyPy",
+            "Topic :: Internet",
+            "Topic :: Internet :: WWW/HTTP",
+            "Topic :: Software Development :: Libraries",
+        ],
+        keywords="pureport multicloud fabric network cloud automation",
+        author=__author__,
+        author_email="info@pureport.com",
+        url="https://www.pureport.com",
+        project_urls={
+            "Documentation": "https://pureport-client.readthedocs.io",
+            "Code": "https://github.com/pureport/pureport-python-client",
+            "Issue tracker": "https://github.com/pureport/pureport-python-client/issues"
+        },
+        license="MIT",
+        packages=find_packages(),
+        install_requires=requirements,
+        include_package_data=True,
+        python_requires="!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4",
+        entry_points={
+            'console_scripts': [
+                'pureport=pureport_client.cli.cli:cli'
+            ]
+        },
+    )
 
-
-setup(
-    name='pureport-client',
-    version='1.0.12',
-    author='Pureport',
-    author_email='noreply@pureport.com',
-    license='MIT',
-    description='An API client for the Pureport ReST API',
-    long_description=open('README.md', 'r').read(),
-    long_description_content_type='text/markdown',
-    url='https://github.com/pureport/pureport-python-client',
-    packages=find_namespace_packages(include=[
-        'pureport.*',
-        'pureport.api.*',
-        'pureport.cli.*',
-        'pureport.exception.*',
-        'pureport.util.*'
-    ]),
-    install_requires=read_requirements('requirements.txt'),
-    entry_points={
-        'console_scripts': [
-            'pureport=pureport.cli.cli:cli'
-        ]
-    },
-    classifiers=[
-        'Programming Language :: Python :: 3',
-        'Operating System :: OS Independent',
-    ]
-)
+if __name__ == '__main__':
+    main()
