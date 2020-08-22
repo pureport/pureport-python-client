@@ -12,11 +12,7 @@ from os.path import (
 )
 
 from enum import Enum
-
-from logging import (
-    basicConfig,
-    getLogger
-)
+from logging import getLogger
 
 from yaml import safe_load
 
@@ -42,8 +38,7 @@ from pureport_client.helpers import (
     retry
 )
 
-basicConfig()
-logger = getLogger('pureport.api.client')
+log = getLogger(__name__)
 
 API_URL = "https://api.pureport.com"
 API_CONFIG_PATH = expanduser('~/.pureport/credentials.yml')
@@ -158,7 +153,7 @@ class Client(object):
         except MissingAccessTokenException:
             pass
         except ClientHttpException as e:
-            logger.exception('There was an attempt to authenticate with '
+            log.exception('There was an attempt to authenticate with '
                              'Pureport, but it failed.', e)
 
     @staticmethod
