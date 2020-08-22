@@ -1,0 +1,13 @@
+# Contributions to the pureport-python project
+
+## Maintainers
+
+* Peter Sprygada <peter.sprygada@pureport.com>
+
+
+## Contributors
+
+In chronological order:
+
+* [Your name or handle] <[email or website]>
+  * [Brief summary of your changes]
