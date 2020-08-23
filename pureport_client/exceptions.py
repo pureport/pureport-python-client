@@ -4,6 +4,27 @@
 # Copyright (c) 2020, Pureport, Inc.
 # All Rights Reserved
 
+"""
+The Pureport exceptions module provies all error classes used in this
+project.  It provides a class hierarchy where all errors derive from the
+```PureportClientError``` exception.
+
+::
+
+    PureportClientError
+      +-- PureportConnectionError
+      |     +-- ConnectionOperationTimeoutError
+      |     +-- ConnectionOperationFailedError
+      +-- MissingAccessTokenError
+      +-- ClientHttpError
+
+
+The exceptions module is pureposefully kept small and additional exception
+classes should ony be added if there is a specific reason to do so.
+Good reasons include adding mandatory arguments such as the case with
+```ClientHttpError```.
+"""
+
 from __future__ import absolute_import
 
 
@@ -34,7 +55,7 @@ class PureportClientError(Exception):
         return self._exc
 
 
-class PureportClientConnectionError(PureportClientError):
+class PureportConnectionError(PureportClientError):
 
     def __init__(self, *args, **kwargs):
         """ Base error class for all Pureport connection errors
@@ -43,7 +64,7 @@ class PureportClientConnectionError(PureportClientError):
         :type connection: Connection
         """
         self._connection = kwargs.pop('connection', None)
-        super(PureportClientConnectionError, self).__init__(*args, **kwargs)
+        super(PureportConnectionError, self).__init__(*args, **kwargs)
 
     @property
     def connection(self):
@@ -54,13 +75,13 @@ class MissingAccessTokenError(PureportClientError):
     pass
 
 
-class ConnectionOperationTimeoutError(PureportClientConnectionError):
+class ConnectionOperationTimeoutError(PureportConnectionError):
     """A connection operation that too long to complete
     """
     pass
 
 
-class ConnectionOperationFailedError(PureportClientConnectionError):
+class ConnectionOperationFailedError(PureportConnectionError):
     """A connection opertion that failed to complete
     """
     pass
