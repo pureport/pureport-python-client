@@ -25,7 +25,7 @@ def test_pureport_client_connection_error():
     obj = MagicMock()
     conn = MagicMock()
 
-    exc = exceptions.PureportClientConnectionError(message, obj, connection=conn)
+    exc = exceptions.PureportConnectionError(message, obj, connection=conn)
 
     assert isinstance(exc, exceptions.PureportClientError)
     assert exc.message == message
@@ -44,7 +44,7 @@ def test_connection_operation_timeout_exception():
     message = utils.random_string()
     exc = exceptions.ConnectionOperationTimeoutError(message)
     assert isinstance(exc, exceptions.PureportClientError)
-    assert isinstance(exc, exceptions.PureportClientConnectionError)
+    assert isinstance(exc, exceptions.PureportConnectionError)
     assert exc.message == message
 
 
@@ -52,7 +52,7 @@ def test_connection_operation_failed_exception():
     message = utils.random_string()
     exc = exceptions.ConnectionOperationFailedError(message)
     assert isinstance(exc, exceptions.PureportClientError)
-    assert isinstance(exc, exceptions.PureportClientConnectionError)
+    assert isinstance(exc, exceptions.PureportConnectionError)
     assert exc.message == message
 
 
