@@ -45,130 +45,133 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
                      access_token=access_token)
 
 
-commands = [
-    {
-        'context': Client.accounts,
-        'commands': [
-            Client.AccountsClient.list,
-            Client.AccountsClient.get,
-            Client.AccountsClient.create,
-            Client.AccountsClient.update,
-            Client.AccountsClient.delete,
-            {
-                'context': Client.AccountsClient.api_keys,
-                'commands': find_client_commands(Client.AccountAPIKeysClient)
-            },
-            {
-                'context': Client.AccountsClient.audit_log,
-                'commands': find_client_commands(Client.AccountAuditLogClient)
-            },
-            {
-                'context': Client.AccountsClient.billing,
-                'commands': find_client_commands(Client.AccountBillingClient)
-            },
-            {
-                'context': Client.AccountsClient.connections,
-                'commands': find_client_commands(Client.AccountConnectionsClient)
-            },
-            {
-                'context': Client.AccountsClient.consent,
-                'commands': find_client_commands(Client.AccountConsentClient)
-            },
-            {
-                'context': Client.AccountsClient.invites,
-                'commands': find_client_commands(Client.AccountInvitesClient)
-            },
-            {
-                'context': Client.AccountsClient.invoices,
-                'commands': find_client_commands(Client.AccountInvoicesClient)
-            },
-            {
-                'context': Client.AccountsClient.members,
-                'commands': find_client_commands(Client.AccountMembersClient)
-            },
-            {
-                'context': Client.AccountsClient.metrics,
-                'commands': find_client_commands(Client.AccountMetricsClient)
-            },
-            {
-                'context': Client.AccountsClient.networks,
-                'commands': find_client_commands(Client.AccountNetworksClient)
-            },
-            {
-                'context': Client.AccountsClient.permissions,
-                'commands': find_client_commands(Client.AccountPermissionsClient)
-            },
-            {
-                'context': Client.AccountsClient.ports,
-                'commands': find_client_commands(Client.AccountPortsClient)
-            },
-            {
-                'context': Client.AccountsClient.roles,
-                'commands': find_client_commands(Client.AccountRolesClient)
-            },
-            {
-                'context': Client.AccountsClient.supported_connections,
-                'commands': find_client_commands(Client.AccountSupportedConnectionsClient)
-            },
-            {
-                'context': Client.AccountsClient.supported_ports,
-                'commands': find_client_commands(Client.AccountSupportedPortsClient)
-            }
-        ]
-    },
-    {
-        'context': Client.cloud_regions,
-        'commands': find_client_commands(Client.CloudRegionsClient)
-    },
-    {
-        'context': Client.cloud_services,
-        'commands': find_client_commands(Client.CloudServicesClient)
-    },
-    {
-        'context': Client.connections,
-        'commands': find_client_commands(Client.ConnectionsClient)
-    },
-    {
-        'context': Client.facilities,
-        'commands': find_client_commands(Client.FacilitiesClient)
-    },
-    {
-        'context': Client.gateways,
-        'commands': find_client_commands(Client.GatewaysClient)
-    },
-    {
-        'context': Client.locations,
-        'commands': find_client_commands(Client.LocationsClient)
-    },
-    {
-        'context': Client.networks,
-        'commands': [
-            Client.NetworksClient.get,
-            Client.NetworksClient.update,
-            Client.NetworksClient.delete,
-            {
-                'context': Client.NetworksClient.connections,
-                'commands': find_client_commands(Client.NetworkConnectionsClient)
-            }
-        ]
-    },
-    {
-        'context': Client.options,
-        'commands': find_client_commands(Client.OptionsClient)
-    },
-    {
-        'context': Client.ports,
-        'commands': find_client_commands(Client.PortsClient)
-    },
-    {
-        'context': Client.supported_connections,
-        'commands': find_client_commands(Client.SupportedConnectionsClient)
-    },
-    {
-        'context': Client.tasks,
-        'commands': find_client_commands(Client.TasksClient)
-    }
-]
+def run():
+    commands = [
+        {
+            'context': Client.accounts,
+            'commands': [
+                Client.AccountsClient.list,
+                Client.AccountsClient.get,
+                Client.AccountsClient.create,
+                Client.AccountsClient.update,
+                Client.AccountsClient.delete,
+                {
+                    'context': Client.AccountsClient.api_keys,
+                    'commands': find_client_commands(Client.AccountAPIKeysClient)
+                },
+                {
+                    'context': Client.AccountsClient.audit_log,
+                    'commands': find_client_commands(Client.AccountAuditLogClient)
+                },
+                {
+                    'context': Client.AccountsClient.billing,
+                    'commands': find_client_commands(Client.AccountBillingClient)
+                },
+                {
+                    'context': Client.AccountsClient.connections,
+                    'commands': find_client_commands(Client.AccountConnectionsClient)
+                },
+                {
+                    'context': Client.AccountsClient.consent,
+                    'commands': find_client_commands(Client.AccountConsentClient)
+                },
+                {
+                    'context': Client.AccountsClient.invites,
+                    'commands': find_client_commands(Client.AccountInvitesClient)
+                },
+                {
+                    'context': Client.AccountsClient.invoices,
+                    'commands': find_client_commands(Client.AccountInvoicesClient)
+                },
+                {
+                    'context': Client.AccountsClient.members,
+                    'commands': find_client_commands(Client.AccountMembersClient)
+                },
+                {
+                    'context': Client.AccountsClient.metrics,
+                    'commands': find_client_commands(Client.AccountMetricsClient)
+                },
+                {
+                    'context': Client.AccountsClient.networks,
+                    'commands': find_client_commands(Client.AccountNetworksClient)
+                },
+                {
+                    'context': Client.AccountsClient.permissions,
+                    'commands': find_client_commands(Client.AccountPermissionsClient)
+                },
+                {
+                    'context': Client.AccountsClient.ports,
+                    'commands': find_client_commands(Client.AccountPortsClient)
+                },
+                {
+                    'context': Client.AccountsClient.roles,
+                    'commands': find_client_commands(Client.AccountRolesClient)
+                },
+                {
+                    'context': Client.AccountsClient.supported_connections,
+                    'commands': find_client_commands(Client.AccountSupportedConnectionsClient)
+                },
+                {
+                    'context': Client.AccountsClient.supported_ports,
+                    'commands': find_client_commands(Client.AccountSupportedPortsClient)
+                }
+            ]
+        },
+        {
+            'context': Client.cloud_regions,
+            'commands': find_client_commands(Client.CloudRegionsClient)
+        },
+        {
+            'context': Client.cloud_services,
+            'commands': find_client_commands(Client.CloudServicesClient)
+        },
+        {
+            'context': Client.connections,
+            'commands': find_client_commands(Client.ConnectionsClient)
+        },
+        {
+            'context': Client.facilities,
+            'commands': find_client_commands(Client.FacilitiesClient)
+        },
+        {
+            'context': Client.gateways,
+            'commands': find_client_commands(Client.GatewaysClient)
+        },
+        {
+            'context': Client.locations,
+            'commands': find_client_commands(Client.LocationsClient)
+        },
+        {
+            'context': Client.networks,
+            'commands': [
+                Client.NetworksClient.get,
+                Client.NetworksClient.update,
+                Client.NetworksClient.delete,
+                {
+                    'context': Client.NetworksClient.connections,
+                    'commands': find_client_commands(Client.NetworkConnectionsClient)
+                }
+            ]
+        },
+        {
+            'context': Client.options,
+            'commands': find_client_commands(Client.OptionsClient)
+        },
+        {
+            'context': Client.ports,
+            'commands': find_client_commands(Client.PortsClient)
+        },
+        {
+            'context': Client.supported_connections,
+            'commands': find_client_commands(Client.SupportedConnectionsClient)
+        },
+        {
+            'context': Client.tasks,
+            'commands': find_client_commands(Client.TasksClient)
+        }
+    ]
 
-for command in construct_commands(commands):
-    cli.add_command(command)
+    for command in construct_commands(commands):
+        cli.add_command(command)
+
+    cli()
