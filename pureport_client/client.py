@@ -25,14 +25,14 @@ from click import (
 from pureport_client.util import JSON
 
 from pureport_client.exceptions import (
-    ClientHttpException,
-    ConnectionOperationFailedException,
-    ConnectionOperationTimeoutException,
-    MissingAccessTokenException,
-    NotFoundException
+    ClientHttpError,
+    ConnectionOperationFailedError,
+    ConnectionOperationTimeoutError,
+    MissingAccessTokenError
 )
 
 from pureport_client.session import PureportSession
+
 from pureport_client.helpers import (
     format_date,
     retry
@@ -150,11 +150,11 @@ class Client(object):
             # we are passing None for base_url by default to prevent cases
             # where environment credentials are different from the passed in base_url.
             self.login(key, secret, access_token, profile, base_url)
-        except MissingAccessTokenException:
+        except MissingAccessTokenError:
             pass
-        except ClientHttpException as e:
+        except ClientHttpError as e:
             log.exception('There was an attempt to authenticate with '
-                             'Pureport, but it failed.', e)
+                          'Pureport, but it failed.', e)
 
     @staticmethod
     def to_link(standard_object, title):
@@ -203,7 +203,7 @@ class Client(object):
         :returns: the obtained access_token
         :rtype: str
         :raises: .exception.ClientHttpException
-        :raises: .exception.MissingAccessTokenException
+        :raises: .exception.MissingAccessTokenError
         """
         file_credentials = Client.__get_file_based_credentials(profile)
         # Update api base_url
@@ -227,7 +227,7 @@ class Client(object):
         elif file_credentials is not None and 'api_key' in file_credentials and 'api_secret' in file_credentials:
             return self.__session.login(file_credentials['api_key'],
                                         file_credentials['api_secret'])
-        raise MissingAccessTokenException()
+        raise MissingAccessTokenError()
 
     def open_api(self):
         """
@@ -366,7 +366,7 @@ class Client(object):
             :param str name: a name for lowercase inter-word checking
             :param int limit: the max number to return
             :rtype: list[Account]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get(
                 '/accounts',
@@ -384,7 +384,7 @@ class Client(object):
             \f
             :param str account_id: the account id
             :rtype: Account
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s' % account_id).json()
 
@@ -395,7 +395,7 @@ class Client(object):
             \f
             :param Account account: the account object
             :rtype: Account
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts', json=account).json()
 
@@ -406,7 +406,7 @@ class Client(object):
             \f
             :param Account account: the account object
             :rtype: Account
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put('/accounts/%s' % account['id'], json=account).json()
 
@@ -416,7 +416,7 @@ class Client(object):
             Delete an account.
             \f
             :param str account_id: the account id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s' % account_id)
 
@@ -585,7 +585,7 @@ class Client(object):
             Get a list of all API keys for an account.
             \f
             :rtype: list[APIKey]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/apikeys' % self.__account_id).json()
 
@@ -596,7 +596,7 @@ class Client(object):
             \f
             :param str api_key_key: the key of an API Key
             :rtype: APIKey
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/apikeys/%s' % (self.__account_id, api_key_key)).json()
 
@@ -607,7 +607,7 @@ class Client(object):
             \f
             :param APIKey api_key: the APIKey object
             :rtype: APIKey
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/apikeys' % self.__account_id, json=api_key).json()
 
@@ -618,7 +618,7 @@ class Client(object):
             \f
             :param APIKey api_key: the APIKey object
             :rtype: APIKey
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put(
                 '/accounts/%s/apikeys/%s' % (self.__account_id, api_key['key']),
@@ -631,7 +631,7 @@ class Client(object):
             Delete an API Key from the provided account.
             \f
             :param str api_key_key: the APIKey key name
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s/apikeys/%s' % (self.__account_id, api_key_key))
 
@@ -718,7 +718,7 @@ class Client(object):
             :param str subject_type:
             :param bool include_child_subjects:
             :rtype: Page[AuditEntry]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get(
                 '/accounts/%s/auditLog' % self.__account_id,
@@ -759,7 +759,7 @@ class Client(object):
             If you want to find if any billing is configured, instead use
             :func:`Client.AccountBillingClient.get_configured`.
             :rtype: AccountBilling
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/billing' % self.__account_id).json()
 
@@ -769,7 +769,7 @@ class Client(object):
             account or any parent account.
             \f
             :rtype: bool
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/billing/configured' % self.__account_id).json()
 
@@ -780,7 +780,7 @@ class Client(object):
             \f
             :param AccountBilling account_billing: the AccountBilling object
             :rtype: AccountBilling
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/billing' % self.__account_id, json=account_billing).json()
 
@@ -791,7 +791,7 @@ class Client(object):
             \f
             :param AccountBilling account_billing: the AccountBilling object
             :rtype: AccountBilling
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put('/accounts/%s/billing' % self.__account_id, json=account_billing).json()
 
@@ -799,7 +799,7 @@ class Client(object):
             """
             Delete the current AccountBilling object from the account if it exists.
             \f
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s/billing' % self.__account_id)
 
@@ -818,7 +818,7 @@ class Client(object):
             Get all connections for the provided account.
             \f
             :rtype: list[Connection]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/connections' % self.__account_id).json()
 
@@ -837,7 +837,7 @@ class Client(object):
             Get the consent information for the provided account.
             \f
             :rtype: AccountConsent
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/consent' % self.__account_id).json()
 
@@ -846,7 +846,7 @@ class Client(object):
             Accept consent for the provided account.
             \f
             :rtype: AccountConsent
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/consent' % self.__account_id).json()
 
@@ -865,7 +865,7 @@ class Client(object):
             Get all invites for the provided account.
             \f
             :rtype: list[AccountInvite]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/invites' % self.__account_id).json()
 
@@ -876,7 +876,7 @@ class Client(object):
             \f
             :param str invite_id: the account invite id
             :rtype: AccountInvite
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/invites/%s' % (self.__account_id, invite_id)).json()
 
@@ -887,7 +887,7 @@ class Client(object):
             \f
             :param AccountInvite invite: the account invite object
             :rtype: AccountInvite
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/invites' % self.__account_id, json=invite).json()
 
@@ -898,7 +898,7 @@ class Client(object):
             \f
             :param AccountInvite invite: the account invite object
             :rtype: AccountInvite
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put(
                 '/accounts/%s/invites/%s' % (self.__account_id, invite['id']),
@@ -911,7 +911,7 @@ class Client(object):
             Delete an account invite using the provided account.
             \f
             :param str invite_id: the account invite id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s/invites/%s' % (self.__account_id, invite_id))
 
@@ -933,7 +933,7 @@ class Client(object):
             :param dict invoice_filter: a filter object that matches Stripe's invoice filter
                 https://stripe.com/docs/api/invoices/list
             :rtype: list[NetworkInvoice]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/invoices' % self.__account_id, json=invoice_filter).json()
 
@@ -942,7 +942,7 @@ class Client(object):
             List all upcoming invoices for an account.
             \f
             :rtype: list[NetworkInvoice]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/invoices/upcoming' % self.__account_id).json()
 
@@ -961,7 +961,7 @@ class Client(object):
             List all members for the provided account.
             \f
             :rtype: list[AccountMember]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/members' % self.__account_id).json()
 
@@ -972,7 +972,7 @@ class Client(object):
             \f
             :param str user_id: a user id
             :rtype: AccountMember
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/members/%s' % (self.__account_id, user_id)).json()
 
@@ -985,7 +985,7 @@ class Client(object):
             user does or does not exist.
             :param AccountMember member:  the account member object
             :rtype: AccountMember
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/members' % self.__account_id, json=member).json()
 
@@ -996,7 +996,7 @@ class Client(object):
             \f
             :param AccountMember member:  the account member object
             :rtype: AccountMember
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put(
                 '/accounts/%s/members/%s' % (self.__account_id, member['user']['id']),
@@ -1009,7 +1009,7 @@ class Client(object):
             Delete a member from the provided account.
             \f
             :param str user_id: a user id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s/members/%s' % (self.__account_id, user_id))
 
@@ -1030,7 +1030,7 @@ class Client(object):
             \f
             :param UsageByConnectionOptions options:
             :rtype: list[NetworkConnectionEgressIngress]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post(
                 '/accounts/%s/metrics/usageByConnection' % self.__account_id,
@@ -1044,7 +1044,7 @@ class Client(object):
             \f
             :param UsageByConnectionAndTimeOptions options:
             :rtype: list[ConnectionTimeEgressIngress]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post(
                 '/accounts/%s/metrics/usageByConnectionAndTime' % self.__account_id,
@@ -1058,7 +1058,7 @@ class Client(object):
             \f
             :param UsageByNetworkAndTimeOptions options:
             :rtype: list[NetworkTimeUsage]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post(
                 '/accounts/%s/metrics/usageByNetworkAndTime' % self.__account_id,
@@ -1080,7 +1080,7 @@ class Client(object):
             Get all networks for the provided account.
             \f
             :rtype: list[Network]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/networks' % self.__account_id).json()
 
@@ -1091,7 +1091,7 @@ class Client(object):
             \f
             :param Network network:  the network object
             :rtype: Network
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/networks' % self.__account_id, json=network).json()
 
@@ -1111,7 +1111,7 @@ class Client(object):
             currently logged in API Key.
             \f
             :rtype: AccountPermissions
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/permissions' % self.__account_id).json()
 
@@ -1130,7 +1130,7 @@ class Client(object):
             Get all ports for the provided account.
             \f
             :rtype: list[Port]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/ports' % self.__account_id).json()
 
@@ -1141,7 +1141,7 @@ class Client(object):
             \f
             :param Port port:  the port object
             :rtype: Port
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/ports' % self.__account_id, json=port).json()
 
@@ -1160,7 +1160,7 @@ class Client(object):
             List all roles for the provided account.
             \f
             :rtype: list[AccountRole]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/roles' % self.__account_id).json()
 
@@ -1171,7 +1171,7 @@ class Client(object):
             \f
             :param str role_id: the role id
             :rtype: AccountRole
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/roles/%s' % (self.__account_id, role_id)).json()
 
@@ -1182,7 +1182,7 @@ class Client(object):
             \f
             :param AccountRole role: the account role object
             :rtype: AccountRole
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/accounts/%s/roles' % self.__account_id, json=role).json()
 
@@ -1193,7 +1193,7 @@ class Client(object):
             \f
             :param AccountRole role: the account role object
             :rtype: AccountRole
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put('/accounts/%s/roles/%s' % (self.__account_id, role['id']), json=role).json()
 
@@ -1203,7 +1203,7 @@ class Client(object):
             Update a role for the provided account.
             \f
             :param str role_id: the role id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/accounts/%s/roles/%s' % (self.__account_id, role_id))
 
@@ -1222,7 +1222,7 @@ class Client(object):
             Get the supported connections for the provided account.
             \f
             :rtype: list[SupportedConnection]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/accounts/%s/supportedConnections' % self.__account_id).json()
 
@@ -1243,7 +1243,7 @@ class Client(object):
             \f
             :param str facility_id: the facility id to list supported ports for
             :rtype: list[SupportedPort]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get(
                 '/accounts/%s/supportedPorts' % self.__account_id,
@@ -1263,7 +1263,7 @@ class Client(object):
             Get all available cloud regions.
             \f
             :rtype: list[CloudRegion]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/cloudRegions').json()
 
@@ -1274,7 +1274,7 @@ class Client(object):
             \f
             :param str cloud_region_id: the cloud region id
             :rtype: CloudRegion
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/cloudRegions/%s' % cloud_region_id).json()
 
@@ -1291,7 +1291,7 @@ class Client(object):
             Get all available cloud services.
             \f
             :rtype: list[CloudRegion]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/cloudServices').json()
 
@@ -1302,7 +1302,7 @@ class Client(object):
             \f
             :param str cloud_service_id: the cloud service id
             :rtype: CloudRegion
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/cloudServices/%s' % cloud_service_id).json()
 
@@ -1315,7 +1315,7 @@ class Client(object):
             self.__session = session
 
         @staticmethod
-        @retry(ConnectionOperationTimeoutException)
+        @retry(ConnectionOperationTimeoutError)
         def get_connection_until_state(session, connection_id, expected_state, failed_states):
             """
             Retrieve a connection until it enters a certain state using an exponential backoff
@@ -1324,34 +1324,34 @@ class Client(object):
             :param ConnectionState|str expected_state: the expected state
             :param list[ConnectionState|str] failed_states: a list of failed states that instead
             :rtype: Connection
-            :raises: .exception.ConnectionOperationTimeoutException
-            :raises: .exception.ConnectionOperationFailedException
+            :raises: .exception.ConnectionOperationTimeoutError
+            :raises: .exception.ConnectionOperationFailedError
             """
             connection = session.get('/connections/%s' % connection_id).json()
             if ConnectionState[connection['state']] in failed_states:
-                raise ConnectionOperationFailedException(connection=connection)
+                raise ConnectionOperationFailedError(connection=connection)
             if ConnectionState[connection['state']] != expected_state:
-                raise ConnectionOperationTimeoutException(connection=connection)
+                raise ConnectionOperationTimeoutError(connection=connection)
             return connection
 
         @staticmethod
-        @retry(ConnectionOperationTimeoutException)
+        @retry(ConnectionOperationTimeoutError)
         def __get_connection_until_not_found(session, connection_id, failed_states):
             """
             Retrieve a connection until it no longer exists using an exponential backoff
             :param RelativeSession session: a :class:`Client`'s relative session
             :param str connection_id: the connection id
             :param list[ConnectionState|str] failed_states: a list of failed states that instead
-            :raises: .exception.ConnectionOperationTimeoutException
-            :raises: .exception.ConnectionOperationFailedException
+            :raises: .exception.ConnectionOperationTimeoutError
+            :raises: .exception.ConnectionOperationFailedError
             """
             try:
                 connection = session.get('/connections/%s' % connection_id).json()
-            except NotFoundException:
+            except ClientHttpError:
                 return
             if ConnectionState[connection['state']] in failed_states:
-                raise ConnectionOperationFailedException(connection=connection)
-            raise ConnectionOperationTimeoutException(connection=connection)
+                raise ConnectionOperationFailedError(connection=connection)
+            raise ConnectionOperationTimeoutError(connection=connection)
 
         @argument('connection_id')
         def get(self, connection_id):
@@ -1360,7 +1360,7 @@ class Client(object):
             \f
             :param str connection_id: the connection id
             :rtype: Connection
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/connections/%s' % connection_id).json()
 
@@ -1374,9 +1374,9 @@ class Client(object):
             :param Connection connection: the connection object
             :param bool wait_until_active: wait until the connection is active using a backoff retry
             :rtype: Connection
-            :raises: .exception.HttpClientException
-            :raises: .exception.ConnectionOperationTimeoutException
-            :raises: .exception.ConnectionOperationFailedException
+            :raises: .exception.ClientHttpError
+            :raises: .exception.ConnectionOperationTimeoutError
+            :raises: .exception.ConnectionOperationFailedError
             """
             connection = self.__session.put('/connections/%s' % connection['id'], json=connection).json()
             if wait_until_active:
@@ -1398,9 +1398,9 @@ class Client(object):
             \f
             :param str connection_id: the connection id
             :param bool wait_until_deleted: wait until the connection is deleted using a backoff retry
-            :raises: .exception.HttpClientException
-            :raises: .exception.ConnectionOperationTimeoutException
-            :raises: .exception.ConnectionOperationFailedException
+            :raises: .exception.ClientHttpError
+            :raises: .exception.ConnectionOperationTimeoutError
+            :raises: .exception.ConnectionOperationFailedError
             """
             self.__session.delete('/connections/%s' % connection_id)
             if wait_until_deleted:
@@ -1417,7 +1417,7 @@ class Client(object):
             \f
             :param str connection_id: the connection id
             :rtype: list[Task]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/connections/%s/tasks' % connection_id).json()
 
@@ -1430,7 +1430,7 @@ class Client(object):
             :param str connection_id: the connection id
             :param Task task: the task
             :rtype: Task
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/connections/%s/tasks' % connection_id, json=task).json()
 
@@ -1447,7 +1447,7 @@ class Client(object):
             Get all available facilities.
             \f
             :rtype: list[Facility]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/facilities').json()
 
@@ -1458,7 +1458,7 @@ class Client(object):
             \f
             :param str facility_id: the facility id
             :rtype: Facility
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/facilities/%s' % facility_id).json()
 
@@ -1477,7 +1477,7 @@ class Client(object):
             \f
             :param str gateway_id: the gateway id
             :rtype: Gateway
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/gateways/%s' % gateway_id).json()
 
@@ -1488,7 +1488,7 @@ class Client(object):
             \f
             :param str gateway_id: the gateway id
             :rtype: list[BGPRoute]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/gateways/%s/bgpRoutes' % gateway_id).json()
 
@@ -1501,7 +1501,7 @@ class Client(object):
             :param str gateway_id: the gateway id
             :param DateFilter date_filter: a date filter consisting of 'gt', 'lt', 'gte', 'lte' properties
             :rtype: list[ConnectivityByGateway]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/gateways/%s/metrics/connectivity' % gateway_id, json=date_filter).json()
 
@@ -1512,7 +1512,7 @@ class Client(object):
             \f
             :param str gateway_id: the gateway id
             :rtype: ConnectivityByGateway
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/gateways/%s/metrics/connectivity/current' % gateway_id).json()
 
@@ -1523,7 +1523,7 @@ class Client(object):
             \f
             :param str gateway_id: the gateway id
             :rtype: list[Task]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/gateways/%s/tasks' % gateway_id).json()
 
@@ -1536,7 +1536,7 @@ class Client(object):
             :param str gateway_id: the gateway id
             :param Task task: the task
             :rtype: Task
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.post('/gateways/%s/tasks' % gateway_id, json=task).json()
 
@@ -1553,7 +1553,7 @@ class Client(object):
             Get all available locations.
             \f
             :rtype: list[Location]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/locations').json()
 
@@ -1564,7 +1564,7 @@ class Client(object):
             \f
             :param str location_id: the location id
             :rtype: Location
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/locations/%s' % location_id).json()
 
@@ -1583,7 +1583,7 @@ class Client(object):
             \f
             :param str network_id: the network id
             :rtype: Network
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/networks/%s' % network_id).json()
 
@@ -1594,7 +1594,7 @@ class Client(object):
             \f
             :param Network network: the network object
             :rtype: Network
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put('/networks/%s' % network['id'], json=network).json()
 
@@ -1604,7 +1604,7 @@ class Client(object):
             Delete a network.
             \f
             :param str network_id: the network id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/networks/%s' % network_id)
 
@@ -1633,7 +1633,7 @@ class Client(object):
             Get all connections for the provided network.
             \f
             :rtype: list[Connection]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/networks/%s/connections' % self.__network_id).json()
 
@@ -1647,9 +1647,9 @@ class Client(object):
             :param Connection connection: the connect object
             :param bool wait_until_active: wait until the connection is active using a backoff retry
             :rtype: Connection
-            :raises: .exception.HttpClientException
-            :raises: .exception.ConnectionOperationTimeoutException
-            :raises: .exception.ConnectionOperationFailedException
+            :raises: .exception.ClientHttpError
+            :raises: .exception.ConnectionOperationTimeoutError
+            :raises: .exception.ConnectionOperationFailedError
             """
             connection = self.__session.post('/networks/%s/connections' % self.__network_id, json=connection).json()
             if wait_until_active:
@@ -1680,7 +1680,7 @@ class Client(object):
             \f
             :param list[str] types: a filter for the list of enumeration types
             :rtype: dict[str, list[Option]]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/options', params={'type': types}).json()
 
@@ -1699,7 +1699,7 @@ class Client(object):
             \f
             :param str port_id: the port id
             :rtype: Port
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/ports/%s' % port_id).json()
 
@@ -1710,7 +1710,7 @@ class Client(object):
             \f
             :param str port_id: the port id
             :rtype: list[Link]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/ports/%s/accounts' % port_id).json()
 
@@ -1721,7 +1721,7 @@ class Client(object):
             \f
             :param Port port: the port object
             :rtype: Port
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.put('/ports/%s' % port['id'], json=port).json()
 
@@ -1731,7 +1731,7 @@ class Client(object):
             Delete a port.
             \f
             :param str port_id: the port id
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             self.__session.delete('/ports/%s' % port_id)
 
@@ -1750,7 +1750,7 @@ class Client(object):
             \f
             :param str supported_connection_id: the supported connection id
             :rtype: SupportedConnection
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/supportedConnections/%s' % supported_connection_id).json()
 
@@ -1775,7 +1775,7 @@ class Client(object):
             :param int page_number: page number for pagination
             :param int page_size: page size for pagination
             :rtype: Page[Task]
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/tasks',
                                       params={
@@ -1791,6 +1791,6 @@ class Client(object):
             \f
             :param str task_id: the task id
             :rtype: Task
-            :raises: .exception.HttpClientException
+            :raises: .exception.ClientHttpError
             """
             return self.__session.get('/tasks/%s' % task_id).json()

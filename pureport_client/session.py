@@ -9,7 +9,7 @@ import time
 
 from requests import Session
 
-from pureport_client.exceptions import raise_response_exception
+from pureport_client.exceptions import ClientHttpError
 
 
 class RelativeSession(Session):
@@ -35,7 +35,8 @@ class RaiseForStatusSession(Session):
 
     def request(self, method, url, **kwargs):
         response = super(RaiseForStatusSession, self).request(method, url, **kwargs)
-        raise_response_exception(response)
+        if response.ok is not True:
+            raise ClientHttpError(response.status_code, response.reason)
         return response
 
 

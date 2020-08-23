@@ -26,7 +26,7 @@ from inspect import getfullargspec, isroutine
 
 from yaml import dump as yaml_dumps
 
-from pureport_client.exceptions import ClientHttpException
+from pureport_client.exceptions import ClientHttpError
 
 
 class __JsonParamType(ParamType):
@@ -87,7 +87,7 @@ def __create_print_wrapper(f):
                 elif response_format == 'yaml':
                     echo(yaml_dumps(response))
             return response
-        except ClientHttpException as e:
+        except ClientHttpError as e:
             echo(e.response.text)
             raise e
     new_func = update_wrapper(new_func, f)

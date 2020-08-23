@@ -34,7 +34,6 @@ def set_logging(level):
         if handler.get_name() == __name__:
             log.debug("logging handler {} is already configured".format(handler.get_name()))
             break
-
     else:
         handler = logging.StreamHandler()
         handler.set_name(__name__)
