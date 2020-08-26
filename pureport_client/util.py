@@ -99,7 +99,7 @@ def __create_print_wrapper(f):
     return new_func
 
 
-def __create_client_group(f):
+def __create_client_group(f, name=None):
     """
     Constructs a Client Group command.
 
@@ -126,7 +126,7 @@ def __create_client_group(f):
         ctx.obj = actual_f(obj, *args, **kwargs)
 
     new_func = update_wrapper(new_func, actual_f)
-    return group()(new_func)
+    return group(name)(new_func)
 
 
 def __create_client_command(f):
@@ -208,7 +208,7 @@ def construct_commands(commands):
     """
     for cmd in commands:
         if isinstance(cmd, dict) and 'context' in cmd:
-            grp = __create_client_group(cmd['context'])
+            grp = __create_client_group(cmd['context'], cmd['name'])
             for child_cmd in construct_commands(cmd['commands']):
                 grp.add_command(child_cmd)
             yield grp
