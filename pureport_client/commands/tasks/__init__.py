@@ -16,6 +16,7 @@ from pureport_client.commands import CommandBase
 
 STATE_CHOICES = ('CREATED', 'RUNNING', 'COMPLETED', 'FAILED', 'DELETED')
 
+
 class Command(CommandBase):
     """Display Pureport task information
     """

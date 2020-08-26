@@ -10,8 +10,6 @@ from pureport_client.commands import (
     AccountsMixin
 )
 
-from pureport_client.util import JSON
-
 
 class Command(AccountsMixin, CommandBase):
     """Display Pureport account permissions

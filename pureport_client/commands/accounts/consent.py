@@ -31,4 +31,4 @@ class Command(AccountsMixin, CommandBase):
         :returns: an AccountConsent object
         :rtype: dict
         """
-        return self.__call__('post', 'consent'
+        return self.__call__('post', 'consent')

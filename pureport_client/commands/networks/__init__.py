@@ -44,7 +44,7 @@ class Command(CommandBase):
         :returns: a network object
         :rtype: dict
         """
-        return self.__call__('put', '/networks/%s'.format(network['id']), json=network)
+        return self.__call__('put', '/networks/{id}'.format(**network), json=network)
 
     @argument('network_id')
     def delete(self, network_id):

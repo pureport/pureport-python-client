@@ -5,6 +5,8 @@
 
 from __future__ import absolute_import
 
+import urllib
+
 from click import (
     option,
     argument
@@ -12,7 +14,11 @@ from click import (
 
 from pureport_client.util import JSON
 from pureport_client.commands import CommandBase
-from pureport_client.commands.connections import get_connection_until_state
+
+from pureport_client.commands.connections import (
+    get_connection_until_state,
+    ConnectionState
+)
 
 
 class Command(CommandBase):

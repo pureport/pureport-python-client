@@ -80,11 +80,10 @@ def run():
                             'context': getattr(mod.Command, item.__name__),
                             'commands': find_client_commands(sub.Command)
                         })
-                    except:
+                    except ImportError:
                         kwargs['commands'].append(item)
 
                 commands.append(kwargs)
-
 
     for command in construct_commands(commands):
         cli.add_command(command)

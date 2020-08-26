@@ -53,7 +53,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: an AccountInvite object
         :rtype: dict
         """
-        return self.__call__('post', 'invites', json=inite)
+        return self.__call__('post', 'invites', json=invite)
 
     @argument('invite', type=JSON)
     def update(self, invite):
@@ -66,7 +66,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: an AccountInvite object
         :rtype: dict
         """
-        return self__call__('put', 'invites/{id}'.format(**invite), json=invite)
+        return self.__call__('put', 'invites/{id}'.format(**invite), json=invite)
 
     @argument('invite_id')
     def delete(self, invite_id):
@@ -78,4 +78,4 @@ class Command(AccountsMixin, CommandBase):
 
         :returns: None
         """
-        self.__call__('delete', 'invites/{}'format(invite_id))
+        self.__call__('delete', 'invites/{}'.format(invite_id))

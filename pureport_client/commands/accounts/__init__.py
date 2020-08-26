@@ -178,7 +178,7 @@ class Command(CommandBase):
         return Command(self.session, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
-    def invites(self, account_id):
+    def invoices(self, account_id):
         """Manage Pureport account invoices
 
         \f

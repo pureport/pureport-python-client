@@ -5,8 +5,6 @@
 
 from __future__ import absolute_import
 
-from urllib.parse import urljoin
-
 from click import argument
 
 from pureport_client.commands import (
@@ -61,7 +59,9 @@ class Command(AccountsMixin, CommandBase):
         :param api_key: the key associated with the API Key to return
         :type api_key: str
         """
-        return self.__call__('put', 'apikeys/(key}'.format(**api_key), json=api_key)
+        return self.__call__(
+            'put', 'apikeys/{key}'.format(**api_key), json=api_key
+        )
 
     @argument('api_key')
     def delete(self, api_key):

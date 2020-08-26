@@ -5,7 +5,6 @@
 
 from __future__ import absolute_import
 
-import importlib
 import urllib
 
 from logging import getLogger
@@ -40,6 +39,3 @@ class AccountsMixin(object):
     def __call__(self, method, url, *args, **kwargs):
         url = urllib.parse.urljoin('/accounts/{}/'.format(self.account_id), url)
         return super(AccountsMixin, self).__call__(method, url, *args, **kwargs)
-
-
-

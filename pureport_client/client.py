@@ -5,8 +5,6 @@
 
 from __future__ import absolute_import
 
-import importlib
-
 from os import getenv
 from os.path import (
     exists,
@@ -17,27 +15,13 @@ from logging import getLogger
 
 from yaml import safe_load
 
-from click import (
-    Choice,
-    argument,
-    option
-)
-
-from pureport_client.util import JSON
-
 from pureport_client.exceptions import (
     ClientHttpError,
-    ConnectionOperationFailedError,
-    ConnectionOperationTimeoutError,
     MissingAccessTokenError
 )
 
 from pureport_client.session import PureportSession
 
-from pureport_client.helpers import (
-    format_date,
-    retry
-)
 
 log = getLogger(__name__)
 
@@ -178,7 +162,7 @@ class Client(object):
             return self.session.login(getenv(ENVIRONMENT_API_KEY), getenv(ENVIRONMENT_API_SECRET))
         elif file_credentials is not None and 'api_key' in file_credentials and 'api_secret' in file_credentials:
             return self.session.login(file_credentials['api_key'],
-                                        file_credentials['api_secret'])
+                                      file_credentials['api_secret'])
         raise MissingAccessTokenError()
 
     def open_api(self):

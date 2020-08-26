@@ -5,8 +5,12 @@
 
 from __future__ import absolute_import
 
-from click import option
+from click import (
+    option,
+    Choice
+)
 
+from pureport_client.helpers import format_date
 from pureport_client.commands import (
     CommandBase,
     AccountsMixin
@@ -61,9 +65,9 @@ class Command(AccountsMixin, CommandBase):
             help='The end time for selecting results between a time range.')
     @option('-i', '--include_child_accounts', is_flag=True,
             help='If the results should include entries from child accounts.')
-    @option('-ev', '--event_types', type=Choice(EVENT_TYPES)
+    @option('-ev', '--event_types', type=Choice(EVENT_TYPES),
             help='Limit the results to particular event types.')
-    @option('-r', '--result', type=Choice(['SUCCESS', 'FAILURE']),
+    @option('-r', '--result', type=Choice(('SUCCESS', 'FAILURE')),
             help='If the result was successful or not.')
     @option('-pi', '--principal_id',
             help='The principal id, e.g. user or api key id.')
@@ -71,15 +75,15 @@ class Command(AccountsMixin, CommandBase):
             help='The correlation id, e.g. id of audit event to surface related events.')
     @option('-si', '--subject_id',
             help='The subject id, e.g. id of audit subject '
-                    '(connection, network, etc.) to surface related events.')
+                 '(connection, network, etc.) to surface related events.')
     @option('-su', '--subject_type', type=Choice(SUBJECT_TYPES),
             help='The subject type')
     @option('-ics', '--include_child_subjects', is_flag=True,
             help='If the results should include entries from child subjects from the subject id.')
     def query(self, page_number=None, page_size=None, sort=None, sort_direction=None,
-                start_time=None, end_time=None, include_child_accounts=None, event_types=None,
-                result=None, principal_id=None, ip_address=None, correlation_id=None, subject_id=None,
-                subject_type=None, include_child_subjects=None):
+              start_time=None, end_time=None, include_child_accounts=None, event_types=None,
+              result=None, principal_id=None, ip_address=None, correlation_id=None, subject_id=None,
+              subject_type=None, include_child_subjects=None):
         """
         Query the audit log for this account.
 
@@ -102,7 +106,7 @@ class Command(AccountsMixin, CommandBase):
         :rtype: Page[AuditEntry]
         :raises: .exception.ClientHttpError
         """
-        params={
+        params = {
             'pageNumber': page_number,
             'pageSize': page_size,
             'sort': sort,
