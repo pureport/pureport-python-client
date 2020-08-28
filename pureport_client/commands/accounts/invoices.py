@@ -25,13 +25,8 @@ class Command(AccountsMixin, CommandBase):
         """List all invoices for an account.
 
         \f
-        # FIXME: to write a better descriptoin for parameters
-        :param dict invoice_filter: a filter object that matches Stripe's invoice filter
-            https://stripe.com/docs/api/invoices/list
-        :rtype: list[NetworkInvoice]
-        :raises: .exception.ClientHttpError
         """
-        return self.__call__('post', 'invoices', json=invoice_filter)
+        return self.__call__('get', 'invoices', json=invoice_filter)
 
     def list_upcoming(self):
         """List all upcoming invoices for an account.

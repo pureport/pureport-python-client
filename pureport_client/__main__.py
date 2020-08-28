@@ -49,7 +49,7 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
                      access_token=access_token)
 
 
-def run():
+def make(cli):
     # XXX: this function will dynamically discover the command tree based on
     # introspecting the Command class in each module.  By design the class
     # introspection is not more than two levels deep.  This will need to be
@@ -64,7 +64,7 @@ def run():
             if not name.startswith('_'):
                 kwargs = {}
 
-                kwargs['name'] = name
+                kwargs['name'] = name.replace('_', '-')
 
                 pkg = "pureport_client.commands.{}".format(name)
                 mod = importlib.import_module(pkg)
@@ -76,7 +76,7 @@ def run():
                     try:
                         sub = importlib.import_module(".".join((pkg, item.__name__)))
                         kwargs['commands'].append({
-                            'name': item.__name__,
+                            'name': item.__name__.replace('_', '-'),
                             'context': getattr(mod.Command, item.__name__),
                             'commands': find_client_commands(sub.Command)
                         })
@@ -88,4 +88,7 @@ def run():
     for command in construct_commands(commands):
         cli.add_command(command)
 
+
+def run():
+    make(cli)
     cli()

@@ -5,15 +5,17 @@
 
 from __future__ import absolute_import
 
-import urllib
-
 from click import (
     option,
     argument
 )
 
 from pureport_client.util import JSON
-from pureport_client.commands import CommandBase
+
+from pureport_client.commands import (
+    CommandBase,
+    NetworksMixin
+)
 
 from pureport_client.commands.connections import (
     get_connection_until_state,
@@ -21,13 +23,9 @@ from pureport_client.commands.connections import (
 )
 
 
-class Command(CommandBase):
+class Command(NetworksMixin, CommandBase):
     """Manage Pureport network connections
     """
-
-    def __call__(self, method, url, *args, **kwargs):
-        url = urllib.parse.urljoin('/networks/{}'.format(self.network_id), url)
-        return super(Command, self).__call__(method, url, *args, **kwargs)
 
     def list(self):
         """List all connections for the provided network

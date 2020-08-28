@@ -81,8 +81,11 @@ class Command(CommandBase):
         \f
         :param gateway_id: the id of the gateway to retrieve stats from
         :type gateway_id: str
+
+        :returns: a Task object
+        :rtype: dict
         """
-        self.__call__('get', '/gateways{}/tasks'.format(gateway_id))
+        self.__call__('get', '/gateways/{}/tasks'.format(gateway_id))
 
     @argument('gateway_id')
     @argument('task', type=JSON)
