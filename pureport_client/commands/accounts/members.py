@@ -56,7 +56,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: the created AccountMember object
         :rtype: dict
         """
-        return self.__call__('put', 'members/{user}'.format(**member['user']), json=member)
+        return self.__call__('put', 'members/{user}'.format(**member), json=member)
 
     @argument('user_id')
     def delete(self, user_id):

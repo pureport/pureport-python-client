@@ -132,7 +132,7 @@ class Command(CommandBase):
         :rtype: dict
         """
         connection = self.__call__(
-            'put', '/connecitons/{id}'.format(**connection), json=connection
+            'put', '/connections/{id}'.format(**connection), json=connection
         )
 
         if wait_until_active:

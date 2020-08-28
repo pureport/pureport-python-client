@@ -27,5 +27,5 @@ class Command(CommandBase):
         :type: dict
         """
         return self.__call__(
-            'get', '/supportConnection/{}'.format(supported_connection_id)
+            'get', '/supportedConnections/{}'.format(supported_connection_id)
         )

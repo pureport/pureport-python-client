@@ -39,3 +39,16 @@ class AccountsMixin(object):
     def __call__(self, method, url, *args, **kwargs):
         url = urllib.parse.urljoin('/accounts/{}/'.format(self.account_id), url)
         return super(AccountsMixin, self).__call__(method, url, *args, **kwargs)
+
+
+class NetworksMixin(object):
+
+    def __init__(self, session, account_id):
+        super(NetworksMixin, self).__init__(session)
+        self._network_id = account_id
+
+    network_id = property(lambda self: self._network_id)
+
+    def __call__(self, method, url, *args, **kwargs):
+        url = urllib.parse.urljoin('/networks/{}/'.format(self.network_id), url)
+        return super(NetworksMixin, self).__call__(method, url, *args, **kwargs)

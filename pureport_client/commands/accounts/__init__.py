@@ -105,7 +105,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.api_keys import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def audit_log(self, account_id):
@@ -119,7 +119,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.audit_log import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def billing(self, account_id):
@@ -133,7 +133,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.billing import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def connections(self, account_id):
@@ -147,7 +147,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.connections import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def consent(self, account_id):
@@ -161,7 +161,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.consent import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def invites(self, account_id):
@@ -175,7 +175,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.invites import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def invoices(self, account_id):
@@ -189,7 +189,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.invoices import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def members(self, account_id):
@@ -203,7 +203,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.members import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def metrics(self, account_id):
@@ -217,7 +217,7 @@ class Command(CommandBase):
         :rtype: Command
         """
         from pureport_client.commands.accounts.metrics import Command
-        return Command(self.session, account_id)
+        return Command(self.client, account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def networks(self, account_id):
