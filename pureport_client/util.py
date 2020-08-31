@@ -29,7 +29,7 @@ from yaml import dump as yaml_dumps
 from pureport_client.exceptions import ClientHttpError
 
 
-class __JsonParamType(ParamType):
+class JsonParamType(ParamType):
     """
     This is simplified and copied from
     [click-params](https://click-params.readthedocs.io/en/latest/usage/miscellaneous/#json).
@@ -50,10 +50,10 @@ class __JsonParamType(ParamType):
         return self.name.upper()
 
 
-JSON = __JsonParamType()
+JSON = JsonParamType()
 
 
-def __insert_click_param(f, param):
+def insert_click_param(f, param):
     """
     Much like :func:`click.decorators._param_memo`, this updates
     the params on a command, but instead of append, it prepends
@@ -66,7 +66,7 @@ def __insert_click_param(f, param):
     f.__click_params__.insert(0, param)
 
 
-def __create_print_wrapper(f):
+def create_print_wrapper(f):
     """
     Creates a print wrapper for commands.  This adds the necessary options for
     formatting results as well as wrapping the command to handle those formatting
@@ -91,7 +91,7 @@ def __create_print_wrapper(f):
             echo(e.response.text)
             raise e
     new_func = update_wrapper(new_func, f)
-    __insert_click_param(new_func,
+    insert_click_param(new_func,
                          Option(['--format'],
                                 type=Choice(['json_pp', 'json', 'yaml']),
                                 default='json_pp',
@@ -99,7 +99,7 @@ def __create_print_wrapper(f):
     return new_func
 
 
-def __create_client_group(f, name=None):
+def create_client_group(f, name=None):
     """
     Constructs a Client Group command.
 
@@ -129,14 +129,14 @@ def __create_client_group(f, name=None):
     return group(name)(new_func)
 
 
-def __create_client_command(f):
+def create_client_command(f):
     """
     Constructs a Client Command.
 
     Given a reference to the Client class function, e.g. the Client.AccountClient.list,
     this constructs a click.Command.
 
-    It passes the parent Group (see __create_client_group) obj (e.g. the Client class instance), then
+    It passes the parent Group (see create_client_group) obj (e.g. the Client class instance), then
     sets invokes the function reference using the parent context `obj` as the `self` argument
     of the command.
 
@@ -149,7 +149,7 @@ def __create_client_command(f):
     :rtype: click.Command
     """
     actual_f = f.fget if isinstance(f, property) else f
-    actual_f = __create_print_wrapper(f)
+    actual_f = create_print_wrapper(f)
 
     @pass_obj
     def new_func(obj, *args, **kwargs):
@@ -159,7 +159,7 @@ def __create_client_command(f):
     return command()(new_func)
 
 
-def __is_regular_method(klass_or_instance, attr):
+def is_regular_method(klass_or_instance, attr):
     """
     Test if a value of a class is regular method.
     https://github.com/MacHu-GWU/inspect_mate-project/blob/master/inspect_mate/tester.py#L88-L114
@@ -193,7 +193,7 @@ def find_client_commands(obj):
     commands = []
     for name in dir(obj):
         if not name.startswith('_'):
-            if __is_regular_method(obj, name):
+            if is_regular_method(obj, name):
                 attr = getattr(obj, name)
                 commands.append(attr)
     return commands
@@ -208,9 +208,9 @@ def construct_commands(commands):
     """
     for cmd in commands:
         if isinstance(cmd, dict) and 'context' in cmd:
-            grp = __create_client_group(cmd['context'], cmd['name'])
+            grp = create_client_group(cmd['context'], cmd['name'])
             for child_cmd in construct_commands(cmd['commands']):
                 grp.add_command(child_cmd)
             yield grp
         else:
-            yield __create_client_command(cmd)
+            yield create_client_command(cmd)
