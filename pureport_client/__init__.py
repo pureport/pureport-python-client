@@ -9,7 +9,7 @@ import logging
 
 from logging import NullHandler
 
-__version__ = "1.0.12-dev"
+__version__ = "1.0.12"
 
 __author__ = "Pureport, Inc"
 __license__ = "MIT"
