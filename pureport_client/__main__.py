@@ -33,14 +33,27 @@ from pureport_client.util import (
 @version_option()
 @pass_context
 def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
-    """
-    \f
-    :param click.Context ctx:
-    :param str api_url:
-    :param str api_key:
-    :param str api_secret:
-    :param str api_profile:
-    :param str access_token:
+    """Main command line interface instance
+
+    :param ctx: internal context instance
+    :type ctx: `click.Context`
+
+    :param api_url: base URL for Pureport REST API
+    :type api_url: str
+
+    :param api_key: Pureport API key to use
+    :type api_key: str
+
+    :param api_secret: Pureport API secret to use
+    :type: api_secret: str
+
+    :param api_profile: Pureport configuration profile to use
+    :type api_profile: str
+
+    :param access_token: Pureport API access token
+    :type access_token: str
+
+    :returns: None
     """
     ctx.obj = Client(base_url=api_url,
                      key=api_key,
@@ -50,6 +63,17 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
 
 
 def make(cli):
+    """Create the Pureport commands tree
+
+    Iterate over all of the commands defined in the `pureport.commands`
+    module and add them to the CLI tree.  Each command must implement
+    the `pureport.commands.CommandBase` object.
+
+    :param cli: the instance of the cli
+    :type cli: `click.core.Group`
+
+    :returns: None
+    """
     # XXX: this function will dynamically discover the command tree based on
     # introspecting the Command class in each module.  By design the class
     # introspection is not more than two levels deep.  This will need to be
@@ -90,5 +114,7 @@ def make(cli):
 
 
 def run():
+    """Main entry point for the command line interface
+    """
     make(cli)
     cli()
