@@ -18,12 +18,13 @@ SERVER_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 def format_date(value):
-    """
-    Formats a datetime, date or string as an ISO-8601 string,
-    2020-01-01T00:00:00.00000Z
-    :param datetime|date|int|str value:
-    :rtype: str|None
-    :raises: ValueError
+    """Formats a datetime, date or string as an ISO-8601 string
+
+    :param value: the date time value to format
+    :type value: object
+
+    :returns a formatted datetime string
+    :rtype: str
     """
     if isinstance(value, datetime):
         return value.strftime(SERVER_DATE_FORMAT)
@@ -53,21 +54,34 @@ def format_date(value):
             except ValueError:
                 pass
         raise ValueError()
-    return None
 
 
 def retry(exception, tries=10, delay=1, backoff=2, max_delay=30):
-    """
-    Retry calling the decorated function using an exponential backoff.
+    """Retry calling the decorated function using an exponential backoff
+
     http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
     original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
     The default here allows for 181 seconds of retry.
     1 + 2 + 4 + 8 + 16 + 30 + 30 + 30 + 30 + 30 = 181
-    :param Exception exception: the exception to check. may be a tuple of exceptions to check
-    :param int tries: number of times to try (not retry) before giving up
-    :param int delay: initial delay between retries in seconds
-    :param int backoff: backoff multiplier e.g. value of 2 will double the delay each retry
-    :param int max_delay: the maximum time between each retry
+
+    :param exception: the exception or list of exceptions to check
+    :type exception: tuple
+
+    :param tries: the number of times to try (not retry) before giving up
+    :type tries: int
+
+    :param delay: initial delay between retries in seconds
+    :type delay: int
+
+    :param backoff: backoff multiplier (e.g. value of 2 will double the
+        delay each retry)
+    :type backoff: int
+
+    :param max_delay: the maximim time between each retry
+    :type max_delay: int
+
+    :returns: a wrapped function
+    :rtype: function
     """
     def deco_retry(f):
         @wraps(f)
