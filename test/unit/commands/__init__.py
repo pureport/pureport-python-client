@@ -86,12 +86,17 @@ cli = __create_mock_cli(client)
 
 def run_command_test(parent, child, *args, **kwargs):
     command = shlex.split(parent)
+
     cli_options = kwargs.pop('cli_options', None)
+    cli_options_post = kwargs.pop('cli_options_post', None)
 
     if cli_options:
         command.extend(shlex.split(cli_options))
 
     command.append(child)
+
+    if cli_options_post:
+        command.extend(shlex.split(cli_options_post))
 
     for a in args:
         if isinstance(a, dict):

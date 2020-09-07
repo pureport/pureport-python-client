@@ -53,7 +53,7 @@ def format_date(value):
                     .strftime(SERVER_DATE_FORMAT)
             except ValueError:
                 pass
-        raise ValueError()
+        raise ValueError(value)
 
 
 def retry(exception, tries=10, delay=1, backoff=2, max_delay=30):

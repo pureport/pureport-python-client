@@ -35,7 +35,7 @@ class ConnectionState(Enum):
 
 
 @retry(ConnectionOperationTimeoutError)
-def get_connection_until_state(session, connection_id, expected_state, failed_states):
+def get_connection_until_state(client, connection_id, expected_state, failed_states):
     """Retrieve a connection until it enters a certain state using an exponential backoff
 
     :param session: a pureport api session instance
@@ -57,7 +57,7 @@ def get_connection_until_state(session, connection_id, expected_state, failed_st
 
     :raises: ConnectionOperationTimeoutError
     """
-    connection = session.get('/connections/%s' % connection_id).json()
+    connection = client('get', '/connections/{}'.format(connection_id))
 
     if ConnectionState[connection['state']] in failed_states:
         raise ConnectionOperationFailedError(connection=connection)
@@ -68,7 +68,7 @@ def get_connection_until_state(session, connection_id, expected_state, failed_st
 
 
 @retry(ConnectionOperationTimeoutError)
-def get_connection_until_not_found(session, connection_id, failed_states):
+def get_connection_until_not_found(client, connection_id, failed_states):
     """Retrieve a connection until it no longer exists using an exponential backoff
 
     :param session: a pureport api session instance
@@ -88,7 +88,7 @@ def get_connection_until_not_found(session, connection_id, failed_states):
     :raises: ConnectionOperationTimeoutError
     """
     try:
-        connection = session.get('/connections/%s' % connection_id).json()
+        connection = client('get', '/connections/{}'.format(connection_id))
     except ClientHttpError:
         return
 
@@ -137,7 +137,7 @@ class Command(CommandBase):
 
         if wait_until_active:
             connection = get_connection_until_state(
-                self.session,
+                self,
                 connection['id'],
                 ConnectionState.ACTIVE,
                 (ConnectionState.FAILED_TO_UPDATE,)
@@ -159,12 +159,19 @@ class Command(CommandBase):
         :type: wait_until_deleted: bool
 
         :returns: None
+
+        :raises: `pureport_client.exceptions.ClientHttpError`
         """
-        self.__call__('delete', '/connections/{}'.format(connection_id))
+        try:
+            self.__call__('delete', '/connections/{}'.format(connection_id))
+        except ClientHttpError as exc:
+            if exc.status_code == 404:
+                return
+            raise
 
         if wait_until_deleted:
             get_connection_until_not_found(
-                self.session,
+                self,
                 connection_id,
                 [ConnectionState.FAILED_TO_DELETE]
             )

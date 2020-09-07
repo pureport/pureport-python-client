@@ -72,24 +72,35 @@ class PureportConnectionError(PureportClientError):
 
 
 class MissingAccessTokenError(PureportClientError):
-    pass
+    """Missing access token for authentication
+    """
+
+    def __init__(self, message=None):
+        message = message or "missing access token"
+        super(MissingAccessTokenError, self).__init__(message)
 
 
 class ConnectionOperationTimeoutError(PureportConnectionError):
     """A connection operation that too long to complete
     """
-    pass
+
+    def __init__(self, message=None, *args, **kwargs):
+        message = message or "connection operation timed out"
+        super(ConnectionOperationTimeoutError, self).__init__(message, *args, **kwargs)
 
 
 class ConnectionOperationFailedError(PureportConnectionError):
     """A connection opertion that failed to complete
     """
-    pass
+
+    def __init__(self, message=None, *args, **kwargs):
+        message = message or "connection operation failed"
+        super(ConnectionOperationFailedError, self).__init__(message, *args, **kwargs)
 
 
 class ClientHttpError(PureportClientError):
 
-    def __init__(self, status_code, reason, *args, **kwargs):
+    def __init__(self, status_code, reason):
         """ An exception representing a bad http call from the client
 
         :param status_code: The numeric HTTP status code return from
@@ -101,7 +112,8 @@ class ClientHttpError(PureportClientError):
         """
         self._status_code = status_code
         self._reason = reason
-        super(ClientHttpError, self).__init__(*args, **kwargs)
+        message = "{} {}".format(status_code, reason)
+        super(ClientHttpError, self).__init__(message)
 
     @property
     def status_code(self):

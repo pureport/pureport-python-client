@@ -29,8 +29,6 @@ from click import (
 
 from yaml import dump as yaml_dumps
 
-from pureport_client.exceptions import ClientHttpError
-
 
 class JsonParamType(ParamType):
     """Backports the click json param type to python 3.5
@@ -96,27 +94,24 @@ def create_print_wrapper(f):
     :rtype: function
     """
     def new_func(*args, **kwargs):
-        try:
-            response_format = kwargs.pop('format')
-            response = f(*args, **kwargs)
-            # if the function returns a response, we'll just echo it as JSON
-            if response is not None:
-                if response_format == 'json_pp':
-                    echo(json_dumps(response, indent=2, sort_keys=True))
-                elif response_format == 'json':
-                    echo(json_dumps(response))
-                elif response_format == 'yaml':
-                    echo(yaml_dumps(response))
-            return response
-        except ClientHttpError as e:
-            echo(e.response.text)
-            raise e
+        response_format = kwargs.pop('format')
+        response = f(*args, **kwargs)
+        # if the function returns a response, we'll just echo it as JSON
+        if response is not None:
+            if response_format == 'json_pp':
+                echo(json_dumps(response, indent=2, sort_keys=True))
+            elif response_format == 'json':
+                echo(json_dumps(response))
+            elif response_format == 'yaml':
+                echo(yaml_dumps(response))
+        return response
+
     new_func = update_wrapper(new_func, f)
     insert_click_param(new_func,
-                        Option(['--format'],
-                               type=Choice(['json_pp', 'json', 'yaml']),
-                               default='json_pp',
-                               help='Specify how responses should be formatted and echoed to the terminal.'))
+                       Option(['--format'],
+                              type=Choice(['json_pp', 'json', 'yaml']),
+                              default='json_pp',
+                              help='Specify how responses should be formatted and echoed to the terminal.'))
     return new_func
 
 
