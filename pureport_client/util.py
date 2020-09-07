@@ -113,10 +113,10 @@ def create_print_wrapper(f):
             raise e
     new_func = update_wrapper(new_func, f)
     insert_click_param(new_func,
-                         Option(['--format'],
-                                type=Choice(['json_pp', 'json', 'yaml']),
-                                default='json_pp',
-                                help='Specify how responses should be formatted and echoed to the terminal.'))
+                        Option(['--format'],
+                               type=Choice(['json_pp', 'json', 'yaml']),
+                               default='json_pp',
+                               help='Specify how responses should be formatted and echoed to the terminal.'))
     return new_func
 
 

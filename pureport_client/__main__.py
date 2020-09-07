@@ -8,6 +8,9 @@ from __future__ import absolute_import
 import os
 import glob
 import importlib
+import logging
+
+from pkg_resources import iter_entry_points
 
 from click import (
     group,
@@ -24,6 +27,9 @@ from pureport_client.util import (
 )
 
 
+log = logging.getLogger(__name__)
+
+
 @group(context_settings={'auto_envvar_prefix': 'PUREPORT'})
 @option('-u', '--api_url', help='The api url for this client.')
 @option('-k', '--api_key', help='The API Key.')
@@ -33,8 +39,8 @@ from pureport_client.util import (
 @version_option()
 @pass_context
 def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
-    """Main command line interface instance
-
+    """
+    \f
     :param ctx: internal context instance
     :type ctx: `click.Context`
 
@@ -62,6 +68,57 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
                      access_token=access_token)
 
 
+def load(pkg):
+    command = {'name': pkg.split('.')[-1].replace('_', '-')}
+    module = importlib.import_module(pkg)
+
+    command['context'] = module.Command
+    command['commands'] = list()
+
+    for item in find_client_commands(module.Command):
+        try:
+            mod = importlib.import_module(".".join((module.__package__, item.__name__)))
+            command['commands'].append({
+                'name': item.__name__.replace('_', '-'),
+                'context': getattr(module.Command, item.__name__),
+                'commands': find_client_commands(mod.Command)
+            })
+        except ImportError:
+            command['commands'].append(item)
+
+    return command
+
+
+def find(path):
+    for item in glob.glob(os.path.join(path, 'commands/*')):
+        if os.path.isdir(item):
+            if not os.path.basename(item).startswith('_'):
+                yield item
+
+
+def load_plugins():
+    plugins = list()
+
+    for item in iter_entry_points('pureport_client.plugins'):
+        plugin = item.load()
+
+        plugin_name = item.name.replace('_', '-')
+        plugin_commands = list()
+
+        for item in find(os.path.dirname(plugin.__file__)):
+            pkg = ".".join((plugin.__package__, 'commands', os.path.basename(item)))
+            log.debug("loading plugin package {}".format(pkg))
+            plugin_commands.append(load(pkg))
+
+        module = importlib.import_module('.'.join((plugin.__package__, 'commands')))
+
+        plugins.append({'name': plugin_name,
+                        'context': getattr(module, 'Command'),
+                        'commands': plugin_commands})
+
+    return plugins
+
+
 def make(cli):
     """Create the Pureport commands tree
 
@@ -79,35 +136,12 @@ def make(cli):
     # introspection is not more than two levels deep.  This will need to be
     # modified in the future, if more than two command levels are required.
 
-    commands = list()
+    commands = load_plugins()
 
-    for item in glob.glob(os.path.join(os.path.dirname(__file__), 'commands/*')):
-        if os.path.isdir(item):
-            name = item.split('/')[-1]
-
-            if not name.startswith('_'):
-                kwargs = {}
-
-                kwargs['name'] = name.replace('_', '-')
-
-                pkg = "pureport_client.commands.{}".format(name)
-                mod = importlib.import_module(pkg)
-                kwargs['context'] = mod.Command
-
-                kwargs['commands'] = list()
-
-                for item in find_client_commands(mod.Command):
-                    try:
-                        sub = importlib.import_module(".".join((pkg, item.__name__)))
-                        kwargs['commands'].append({
-                            'name': item.__name__.replace('_', '-'),
-                            'context': getattr(mod.Command, item.__name__),
-                            'commands': find_client_commands(sub.Command)
-                        })
-                    except ImportError:
-                        kwargs['commands'].append(item)
-
-                commands.append(kwargs)
+    for item in find(os.path.dirname(__file__)):
+        pkg = ".".join((__package__, 'commands', os.path.basename(item)))
+        log.debug("loading core package {}".format(pkg))
+        commands.append(load(pkg))
 
     for command in construct_commands(commands):
         cli.add_command(command)
