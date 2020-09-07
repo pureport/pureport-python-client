@@ -18,6 +18,14 @@ def test_update():
     run_command_test('connections', 'update', {'id': utils.random_string()})
 
 
+# FIXME currently the run_command_test doesn't provide a way to control the
+# response from the mocked object.  need to update the run_command_test
+# function to include this option
+# def test_update_wait():
+#     run_command_test('connections', 'update', {'id': utils.random_string()},
+#                      cli_options_post="-w")
+
+
 def test_delete():
     run_command_test('connections', 'delete', utils.random_string())
 

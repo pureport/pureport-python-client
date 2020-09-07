@@ -57,11 +57,10 @@ def test_connection_operation_failed_exception():
 
 
 def test_client_http_exception():
-    message = utils.random_string()
     status_code = utils.random_int()
     reason = utils.random_string()
-    exc = exceptions.ClientHttpError(status_code, reason, message)
+    exc = exceptions.ClientHttpError(status_code, reason)
     assert isinstance(exc, exceptions.PureportClientError)
-    assert exc.message == message
+    assert exc.message == "{} {}".format(status_code, reason)
     assert exc.status_code == status_code
     assert exc.reason == reason
