@@ -19,7 +19,8 @@ from click import (
     version_option
 )
 
-from pureport_client.client import Client
+from pureport.session import Session
+from pureport.credentials import default
 
 from pureport_client.util import (
     construct_commands,
@@ -61,11 +62,16 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
 
     :returns: None
     """
-    ctx.obj = Client(base_url=api_url,
-                     key=api_key,
-                     secret=api_secret,
-                     profile=api_profile,
-                     access_token=access_token)
+    # FIXME current Session class doesn't allow credentials to be passed in so
+    # we work around it with environment variables
+    if api_url:
+        os.environ['PUREPORT_API_BASE_URL'] = api_url
+    if api_key:
+        os.environ['PUREPORT_API_KEY'] = api_key
+    if api_secret:
+        os.environ['PUREPORT_API_SECRET'] = api_secret
+
+    ctx.obj = Session(*default())
 
 
 def load(pkg):

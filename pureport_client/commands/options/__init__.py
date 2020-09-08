@@ -30,4 +30,5 @@ class Command(CommandBase):
         :returns: a list of option objects
         :rtype: list
         """
-        return self.__call__('get', '/options', params={'type': types})
+        kwargs = {'query': {'types': types}} if types else {}
+        return self.__call__('get', '/options', **kwargs)

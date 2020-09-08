@@ -41,8 +41,9 @@ class Command(CommandBase):
         :returns: a liist of accounts
         :rtype: list
         """
-        params = {'ids': ids, 'parentId': parent_id, 'name': name, 'limit': limit}
-        return self.__call__('get', '/accounts', params=params)
+        query = {'ids': ids, 'parentId': parent_id, 'name': name, 'limit': limit}
+        kwargs = {'query': dict(((k, v) for k, v in query.items() if v))}
+        return self.__call__('get', '/accounts', **kwargs)
 
     @argument('account_id')
     def get(self, account_id):

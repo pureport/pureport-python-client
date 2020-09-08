@@ -123,4 +123,5 @@ class Command(AccountsMixin, CommandBase):
             'subjectType': subject_type,
             'includeChildSubjects': include_child_subjects
         }
-        return self.__call__('get', 'auditLog', params=params)
+        kwargs = {'query': dict(((k, v) for k, v in params.items() if v))}
+        return self.__call__('get', 'auditLog', **kwargs)
