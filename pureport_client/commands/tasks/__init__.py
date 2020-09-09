@@ -43,7 +43,8 @@ class Command(CommandBase):
         """
         params = {'state': state, 'pageNumber': page_number,
                   'pageSize': page_size}
-        return self.__call__('get', '/tasks', params=params)
+        kwargs = {'query': dict(((k, v) for k, v in params.items() if v))}
+        return self.__call__('get', '/tasks', **kwargs)
 
     @argument('task_id')
     def get(self, task_id):

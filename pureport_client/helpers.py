@@ -97,3 +97,24 @@ def retry(exception, tries=10, delay=1, backoff=2, max_delay=30):
             return f(*args, **kwargs)
         return f_retry  # true decorator
     return deco_retry
+
+
+def paginate(client_fun, *args, **kwargs):
+    """
+    Given a client function that supports the page_size and page_number
+    keyword arguments for pagination, this generator will yield all results
+    from that function.
+    :param function client_fun:
+    :rtype: Iterator
+    """
+    resp = client_fun(*args, **kwargs)
+    yield from resp['content']
+    total_elements = resp['totalElements']
+    page_size = resp['pageSize']
+    page_number = resp['pageNumber'] + 1
+    if 'page_number' in kwargs:
+        kwargs.pop('page_number')
+    while page_number * page_size < total_elements:
+        resp = client_fun(*args, page_number=page_number, **kwargs)
+        yield from resp['content']
+        page_number = resp['pageNumber'] + 1

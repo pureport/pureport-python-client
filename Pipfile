@@ -7,7 +7,6 @@ verify_ssl = true
 coverage = "*"
 flake8 = "*"
 pylint = "*"
-requests-mock = "*"
 pytest = "*"
 tox = "*"
 pytest-cov = "*"
@@ -15,5 +14,4 @@ pytest-randomly = "*"
 
 [packages]
 click = "*"
-requests = "*"
-PyYAML = "*"
+pureport-python = "*"

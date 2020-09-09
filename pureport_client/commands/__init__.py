@@ -42,7 +42,9 @@ class CommandBase(object):
         :rtype: dict (or list)
         """
         log.debug('{} {}'.format(method.upper(), url))
-        return getattr(self.client.session, method)(url, *args, **kwargs).json()
+        if 'params' in kwargs:
+            kwargs['query'] = kwargs.pop('params')
+        return getattr(self.client, method)(url, *args, **kwargs).json
 
 
 class AccountsMixin(object):

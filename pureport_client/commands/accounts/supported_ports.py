@@ -28,5 +28,5 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of SupportPort objects
         :rtype: list
         """
-        params = {'facility': facility_id}
-        return self.__call__('get', 'supportedPorts', params=params)
+        kwargs = {'query': {'facility': facility_id}}
+        return self.__call__('get', 'supportedPorts', **kwargs)

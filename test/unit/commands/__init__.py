@@ -11,54 +11,31 @@ import shlex
 import importlib
 
 from re import compile, sub
+from unittest.mock import MagicMock
+from collections import namedtuple
+from functools import partial
+
 
 from click import group, pass_context, version_option
 from click.testing import CliRunner
 
-from requests_mock import Adapter
-
 from pureport_client import __main__ as main
-from pureport_client.client import Client
-from pureport_client.session import PureportSession
 
 
-def __create_mock_client():
-    """
-    This creates a mock :class:`Client` instance.  It uses
-    a real client to call out to the server for the OpenAPI data
-    and constructs mock paths that can emulate the resources available
-    on the server
-    :rtype: Client
-    """
-    adapter = Adapter()
+path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'openapi.json')
+open_api = json.loads(open(path).read())
 
-    # Loads all paths from OpenAPI as mock path matchers
-    # The paths come in the form '/accounts/{account_id}', which we'll
-    # instead convert to proper Regex path's /accounts/([^/]+)
+urls = {}
 
-    path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'openapi.json')
-    open_api = json.loads(open(path).read())
-
-    for path, path_obj in open_api['paths'].items():
-        url = compile('^mock://' + sub(r'{[^}]+}', '([^/]+)', path) + '$')
-        for method, method_obj in path_obj.items():
-            adapter.register_uri(method.upper(), url, json={})
-
-    adapter.register_uri('POST',
-                         'mock:///login',
-                         json={
-                             'access_token': '',
-                             'refresh_token': '',
-                             'expires_in': 2 ^ 31
-                         })
-
-    session = PureportSession(base_url='mock://')
-    session.mount('mock', adapter)
-
-    return Client(base_url='mock://', key='', secret='', session=session)
+for path, path_obj in open_api['paths'].items():
+    url = compile('^' + sub(r'{[^}]+}', '([^/]+)', path) + '$')
+    for method in path_obj:
+        if url not in urls:
+            urls[url] = list()
+        urls[url].append(method.upper())
 
 
-def __create_mock_cli(pureport_client):
+def create_mock_cli(pureport_client):
     """
     This creates a mock CLI using a mock client.
     :param Client pureport_client:
@@ -79,9 +56,28 @@ def __create_mock_cli(pureport_client):
     return cli
 
 
-client = __create_mock_client()
+Response = namedtuple('Response', ('status', 'data', 'headers', 'json'))
+response = partial(Response, status=200, data=None, headers=None, json=json.dumps({}))
+
+
+def request(*args, **kwargs):
+    for url in urls:
+        match = url.match(args[0])
+        if match:
+            break
+    else:
+        raise AssertionError(args[0])
+    return response()
+
+
+client = MagicMock()
+client.get.side_effect = request
+client.post.side_effect = request
+client.put.side_effect = request
+client.delete.side_effect = request
+
 runner = CliRunner()
-cli = __create_mock_cli(client)
+cli = create_mock_cli(client)
 
 
 def run_command_test(parent, child, *args, **kwargs):
