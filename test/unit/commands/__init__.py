@@ -70,11 +70,16 @@ def request(*args, **kwargs):
     return response()
 
 
+def find_networks():
+    return []
+
+
 client = MagicMock()
 client.get.side_effect = request
 client.post.side_effect = request
 client.put.side_effect = request
 client.delete.side_effect = request
+client.find_networks.side_effect = find_networks
 
 runner = CliRunner()
 cli = create_mock_cli(client)

@@ -6,10 +6,9 @@
 from __future__ import absolute_import
 
 from functools import update_wrapper
-
-from json import dumps as json_dumps
 from json import loads as json_loads
 from json import JSONDecodeError
+from pureport_client.helpers import format_output
 
 from inspect import (
     getfullargspec,
@@ -26,8 +25,6 @@ from click import (
     Option,
     ParamType
 )
-
-from yaml import dump as yaml_dumps
 
 
 class JsonParamType(ParamType):
@@ -96,21 +93,14 @@ def create_print_wrapper(f):
     def new_func(*args, **kwargs):
         response_format = kwargs.pop('format')
         response = f(*args, **kwargs)
-        # if the function returns a response, we'll just echo it as JSON
-        if response is not None:
-            if response_format == 'json_pp':
-                echo(json_dumps(response, indent=2, sort_keys=True))
-            elif response_format == 'json':
-                echo(json_dumps(response))
-            elif response_format == 'yaml':
-                echo(yaml_dumps(response))
+        echo(format_output(response, response_format))
         return response
 
     new_func = update_wrapper(new_func, f)
     insert_click_param(new_func,
                        Option(['--format'],
-                              type=Choice(['json_pp', 'json', 'yaml']),
-                              default='json_pp',
+                              type=Choice(['json_pp', 'json', 'yaml', 'column']),
+                              default='column',
                               help='Specify how responses should be formatted and echoed to the terminal.'))
     return new_func
 
