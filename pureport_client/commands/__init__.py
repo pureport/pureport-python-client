@@ -25,6 +25,7 @@ class CommandBase(object):
         :returns: an instance of CommandBase
         :rtype: `pureport_client.commands.CommandBase`
         """
+        client.make_bindings()
         self._client = client
 
     client = property(lambda self: self._client)
