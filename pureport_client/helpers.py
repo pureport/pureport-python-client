@@ -141,11 +141,11 @@ def format_output(response, response_format):
         has_printed_columns = False
         if isinstance(response, list) and len(response) > 0 and isinstance(response[0], models.Network):
             if response_format != 'column':
-                response = __serialize_response_model__(response)
+                response = [o.serialize() for o in response]
             else:
-                echoString = column_dumps(response)
+                echo_string = column_dumps(response)
                 has_printed_columns = True
-                return echoString
+                return echo_string
 
         # fallback mode
         if response_format == 'json_pp' or (response_format == 'column' and not has_printed_columns):
@@ -154,10 +154,3 @@ def format_output(response, response_format):
             return json_dumps(response)
         elif response_format == 'yaml':
             return yaml_dumps(response)
-
-
-def __serialize_response_model__(response):
-    returnObj = []
-    for obj in response:
-        returnObj.append(obj.serialize())
-    return returnObj

@@ -14,7 +14,7 @@ network_list_column_values = [
 
 
 def print_networks(response):
-    """prints a column stle output for a list of networks
+    """prints a column style output for a list of networks
        currently only supports 'pureport accounts network list
 
     :param response: the response object

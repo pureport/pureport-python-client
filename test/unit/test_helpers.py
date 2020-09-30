@@ -34,7 +34,7 @@ def test_format_output_json():
     assert output == '[]'
 
 
-def __make_models__(models, mock_get_api):
+def make_models(models, mock_get_api):
     basepath = os.path.dirname(__file__)
     content = json.loads(
         open(os.path.join(basepath, '../openapi.json')).read()
@@ -46,7 +46,7 @@ def __make_models__(models, mock_get_api):
 
 @patch.object(models, 'get_api')
 def test_format_output_columns(mock_get_api):
-    __make_models__(models, mock_get_api)
+    make_models(models, mock_get_api)
 
     response = [models.Network(id='id', name='name', state='ACTIVE')]
     output = helpers.format_output(response, 'column')
@@ -57,7 +57,7 @@ def test_format_output_columns(mock_get_api):
 
 @patch.object(models, 'get_api')
 def test_format_output_json_with_model(mock_get_api):
-    __make_models__(models, mock_get_api)
+    make_models(models, mock_get_api)
     response = [models.Network(id='id', name='name', state='ACTIVE')]
     output = helpers.format_output(response, 'json')
     # assert output == '[{"id": "id", "name": "name", "state": "ACTIVE"}]'
@@ -66,7 +66,7 @@ def test_format_output_json_with_model(mock_get_api):
 
 @patch.object(models, 'get_api')
 def test_format_output_column_fallback(mock_get_api):
-    __make_models__(models, mock_get_api)
+    make_models(models, mock_get_api)
     response = [{'id': 'id'}]
     output = helpers.format_output(response, 'column')
     assert output == '[\n  {\n    "id": "id"\n  }\n]'
@@ -74,7 +74,7 @@ def test_format_output_column_fallback(mock_get_api):
 
 @patch.object(models, 'get_api')
 def test_format_output_yaml(mock_get_api):
-    __make_models__(models, mock_get_api)
+    make_models(models, mock_get_api)
     response = [{'id': 'id'}]
     output = helpers.format_output(response, 'yaml')
     assert output == '- id: id\n'
