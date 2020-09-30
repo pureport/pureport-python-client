@@ -6,7 +6,6 @@
 from __future__ import absolute_import
 
 import time
-
 from json import dumps as json_dumps
 from yaml import dump as yaml_dumps
 

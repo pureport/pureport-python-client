@@ -4,15 +4,13 @@
 # All Rights Reserved
 
 import datetime
-
+import os
+import json
 import pytest
+from unittest.mock import patch, Mock
 
 from pureport_client import helpers
 from pureport import models
-from unittest.mock import patch, Mock
-import os
-import json
-
 from ..utils import utils
 
 
