@@ -6,6 +6,10 @@
 from __future__ import absolute_import
 
 import time
+from json import dumps as json_dumps
+from yaml import dump as yaml_dumps
+
+from pureport_client.column_printer import print_networks as column_dumps
 
 from functools import wraps
 from datetime import (
@@ -13,6 +17,7 @@ from datetime import (
     datetime
 )
 
+from pureport import models
 
 SERVER_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
@@ -118,3 +123,34 @@ def paginate(client_fun, *args, **kwargs):
         resp = client_fun(*args, page_number=page_number, **kwargs)
         yield from resp['content']
         page_number = resp['pageNumber'] + 1
+
+
+def format_output(response, response_format):
+    """Formats the output of the response object into the specified format option
+
+    :param response: the response object
+    :type response: object
+
+    :param response_format the format type to be printed, json_pp, json, yaml, and column are options
+    :type response_format: str
+
+    :returns a formatted output string
+    :rtype: str
+    """
+    if response is not None:
+        has_printed_columns = False
+        if isinstance(response, list) and len(response) > 0 and isinstance(response[0], models.Network):
+            if response_format != 'column':
+                response = [o.serialize() for o in response]
+            else:
+                echo_string = column_dumps(response)
+                has_printed_columns = True
+                return echo_string
+
+        # fallback mode
+        if response_format == 'json_pp' or (response_format == 'column' and not has_printed_columns):
+            return json_dumps(response, indent=2, sort_keys=True)
+        elif response_format == 'json':
+            return json_dumps(response)
+        elif response_format == 'yaml':
+            return yaml_dumps(response)

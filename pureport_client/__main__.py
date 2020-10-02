@@ -71,7 +71,7 @@ def cli(ctx, api_url, api_key, api_secret, api_profile, access_token):
     if api_secret:
         os.environ['PUREPORT_API_SECRET'] = api_secret
 
-    ctx.obj = Session(*default())
+    ctx.obj = Session(*default(), automake_bindings=True)
 
 
 def load(pkg):

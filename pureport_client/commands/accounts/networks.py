@@ -26,7 +26,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of Network objects
         :rtype: list
         """
-        return self.__call__('get', 'networks')
+        return self.client.find_networks()
 
     @argument('network', type=JSON)
     def create(self, network):
