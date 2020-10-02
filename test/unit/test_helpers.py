@@ -60,7 +60,6 @@ def test_format_output_json_with_model(mock_get_api):
     make_models(models, mock_get_api)
     response = [models.Network(id='id', name='name', state='ACTIVE')]
     output = helpers.format_output(response, 'json')
-    # assert output == '[{"id": "id", "name": "name", "state": "ACTIVE"}]'
     assert json.loads(output) == [{"id": "id", "name": "name", "state": "ACTIVE"}]
 
 

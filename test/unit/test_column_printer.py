@@ -14,27 +14,27 @@ title_row = 'ID' + (33 * ' ') + 'NAME' + (21 * ' ') + 'STATE' + (20 * ' ') + 'TA
 @patch.object(models, 'get_api')
 def test_empty_list(mock_get_api):
     make_models(models, mock_get_api)
-    printString = column_printer.print_networks([])
-    assert printString == title_row
+    print_string = column_printer.print_networks([])
+    assert print_string == title_row
 
 
 @patch.object(models, 'get_api')
 def test_empty_tags(mock_get_api):
     make_models(models, mock_get_api)
-    sampleNetwork = models.Network(id='sample_id', name='sample_name')
-    sampleNetwork.state = 'ACTIVE'
-    printString = column_printer.print_networks([sampleNetwork])
+    sample_network = models.Network(id='sample_id', name='sample_name')
+    sample_network.state = 'ACTIVE'
+    print_string = column_printer.print_networks([sample_network])
     second_row = 'sample_id' + (26 * ' ') + 'sample_name' + (14 * ' ') + 'ACTIVE' + (19 * ' ') + 'No Tags\n'
-    assert printString == title_row + second_row
+    assert print_string == title_row + second_row
 
 
 @patch.object(models, 'get_api')
 def test_with_tags(mock_get_api):
     make_models(models, mock_get_api)
     tag = {'tagkey': 'tagValue'}
-    sampleNetwork = models.Network(id='sample_id', name='sample_name')
-    sampleNetwork.state = 'ACTIVE'
-    sampleNetwork.tags = tag
-    printString = column_printer.print_networks([sampleNetwork])
+    sample_network = models.Network(id='sample_id', name='sample_name')
+    sample_network.state = 'ACTIVE'
+    sample_network.tags = tag
+    print_string = column_printer.print_networks([sample_network])
     second_row = 'sample_id' + (26 * ' ') + 'sample_name' + (14 * ' ') + 'ACTIVE' + (19 * ' ') + '{"tagkey": "tagValue"}\n'
-    assert printString == title_row + second_row
+    assert print_string == title_row + second_row
