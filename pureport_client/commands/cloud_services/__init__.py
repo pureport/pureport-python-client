@@ -21,7 +21,7 @@ class Command(CommandBase):
         :returns: a list of cloud services
         :rtype: list
         """
-        return self.__call__('get', '/cloudServices')
+        return self.client.get_cloud_services()
 
     @argument('cloud_service_id')
     def get(self, cloud_service_id):

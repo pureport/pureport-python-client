@@ -26,7 +26,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: list of account objects
         :rtype: list
         """
-        return self.__call__('get', 'apikeys')
+        return self.client.find_api_keys()
 
     @argument('api_key')
     def get(self, api_key):

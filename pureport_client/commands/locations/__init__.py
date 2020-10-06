@@ -21,7 +21,7 @@ class Command(CommandBase):
         :returns: a list of location objects
         :rtype: list
         """
-        return self.__call__('get', '/locations')
+        return self.client.find_locations()
 
     @argument('location_id')
     def get(self, location_id):

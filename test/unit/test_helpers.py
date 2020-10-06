@@ -51,7 +51,7 @@ def test_format_output_columns(mock_get_api):
     response = [models.Network(id='id', name='name', state='ACTIVE')]
     output = helpers.format_output(response, 'column')
     title_row = 'ID' + (33 * ' ') + 'NAME' + (21 * ' ') + 'STATE' + (20 * ' ') + 'TAGS\n'
-    second_row = 'id' + (33 * ' ') + 'name' + (21 * ' ') + 'ACTIVE' + (19 * ' ') + 'No Tags\n'
+    second_row = 'id' + (33 * ' ') + 'name' + (21 * ' ') + 'ACTIVE' + (19 * ' ') + '\n'
     assert output == (title_row + second_row)
 
 
@@ -69,6 +69,16 @@ def test_format_output_column_fallback(mock_get_api):
     response = [{'id': 'id'}]
     output = helpers.format_output(response, 'column')
     assert output == '[\n  {\n    "id": "id"\n  }\n]'
+
+
+@patch.object(models, 'get_api')
+def test_format_output_account_columns(mock_get_api):
+    make_models(models, mock_get_api)
+    response = [models.Account(id='id', name='name')]
+    output = helpers.format_output(response, 'column')
+    title_row = 'ID' + (33 * ' ') + 'NAME\n'
+    second_row = 'id' + (33 * ' ') + 'name\n'
+    assert output == title_row + second_row
 
 
 @patch.object(models, 'get_api')
