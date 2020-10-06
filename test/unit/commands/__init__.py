@@ -70,7 +70,7 @@ def request(*args, **kwargs):
     return response()
 
 
-def find_networks():
+def return_object(query=None):
     return []
 
 
@@ -79,7 +79,20 @@ client.get.side_effect = request
 client.post.side_effect = request
 client.put.side_effect = request
 client.delete.side_effect = request
-client.find_networks.side_effect = find_networks
+# all client functions
+client.find_networks.side_effect = return_object
+client.find_all_accounts.side_effect = return_object
+client.find_all_roles.side_effect = return_object
+client.find_api_keys.side_effect = return_object
+client.find_connections.side_effect = return_object
+client.find_account_invites.side_effect = return_object
+client.find_ports.side_effect = return_object
+client.find_all_roles.side_effect = return_object
+client.get_account_supported_connections.side_effect = return_object
+client.get_cloud_regions.side_effect = return_object
+client.get_cloud_services.side_effect = return_object
+client.find_facilities.side_effect = return_object
+client.find_locations.side_effect = return_object
 
 runner = CliRunner()
 cli = create_mock_cli(client)

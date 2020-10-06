@@ -21,7 +21,7 @@ class Command(CommandBase):
         :returns: a list of cloud region objects
         :rtype: list
         """
-        return self.__call__('get', '/cloudRegions')
+        return self.client.get_cloud_regions()
 
     @argument('cloud_region_id')
     def get(self, cloud_region_id):

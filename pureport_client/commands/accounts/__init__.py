@@ -43,7 +43,7 @@ class Command(CommandBase):
         """
         query = {'ids': ids, 'parentId': parent_id, 'name': name, 'limit': limit}
         kwargs = {'query': dict(((k, v) for k, v in query.items() if v))}
-        return self.__call__('get', '/accounts', **kwargs)
+        return self.client.find_all_accounts(**kwargs)
 
     @argument('account_id')
     def get(self, account_id):

@@ -22,4 +22,4 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of SupportedConnection objects
         :rtype: list
         """
-        return self.__call__('get', 'supportedConnections')
+        return self.client.get_account_supported_connections()

@@ -21,7 +21,7 @@ class Command(CommandBase):
         :returns: a list of all Pureport facilities
         :rtype: list
         """
-        return self.__call__('get', '/facilities')
+        return self.client.find_facilities()
 
     @argument('facility_id')
     def get(self, facility_id):

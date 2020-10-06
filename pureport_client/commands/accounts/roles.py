@@ -26,7 +26,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of AccountRole objects
         :rtype: list
         """
-        return self.__call__('get', 'roles')
+        return self.client.find_all_roles()
 
     @argument('role_id')
     def get(self, role_id):

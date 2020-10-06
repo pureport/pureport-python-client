@@ -26,7 +26,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of Port objects
         :rtype: list
         """
-        return self.__call__('get', 'ports')
+        return self.client.find_ports()
 
     @argument('port', type=JSON)
     def create(self, port):

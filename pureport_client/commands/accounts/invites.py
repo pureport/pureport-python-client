@@ -27,7 +27,7 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of AccountInvite objects
         :rtype: list
         """
-        return self.__call__('get', 'invites')
+        return self.client.find_account_invites()
 
     @argument('invite_id')
     def get(self, invite_id):

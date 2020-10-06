@@ -9,7 +9,7 @@ import time
 from json import dumps as json_dumps
 from yaml import dump as yaml_dumps
 
-from pureport_client.column_printer import print_networks as column_dumps
+from pureport_client.column_printer import print_columns as column_dumps
 
 from functools import wraps
 from datetime import (
@@ -20,6 +20,11 @@ from datetime import (
 from pureport import models
 
 SERVER_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+
+column_supported_models = [
+    'Network',
+    'Account'
+]
 
 
 def format_date(value):
@@ -139,11 +144,12 @@ def format_output(response, response_format):
     """
     if response is not None:
         has_printed_columns = False
-        if isinstance(response, list) and len(response) > 0 and isinstance(response[0], models.Network):
-            if response_format != 'column':
+        if isinstance(response, list) and len(response) > 0 and hasattr(models, type(response[0]).__name__):
+            response_type = type(response[0]).__name__
+            if response_format != 'column' or response_type not in column_supported_models:
                 response = [o.serialize() for o in response]
             else:
-                echo_string = column_dumps(response)
+                echo_string = column_dumps(response, response_type)
                 has_printed_columns = True
                 return echo_string
 
