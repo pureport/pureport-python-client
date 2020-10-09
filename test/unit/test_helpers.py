@@ -45,7 +45,7 @@ def make_models(models, mock_get_api):
 
 
 @patch.object(models, 'get_api')
-def test_format_output_columns(mock_get_api):
+def test_format_output_columns_list(mock_get_api):
     make_models(models, mock_get_api)
 
     response = [models.Network(id='id', name='name', state='ACTIVE')]
@@ -56,11 +56,30 @@ def test_format_output_columns(mock_get_api):
 
 
 @patch.object(models, 'get_api')
-def test_format_output_json_with_model(mock_get_api):
+def test_format_output_columns(mock_get_api):
+    make_models(models, mock_get_api)
+
+    response = models.Network(id='id', name='name', state='ACTIVE')
+    output = helpers.format_output(response, 'column')
+    title_row = 'ID' + (33 * ' ') + 'NAME' + (21 * ' ') + 'STATE' + (20 * ' ') + 'TAGS\n'
+    second_row = 'id' + (33 * ' ') + 'name' + (21 * ' ') + 'ACTIVE' + (19 * ' ') + '\n'
+    assert output == (title_row + second_row)
+
+
+@patch.object(models, 'get_api')
+def test_format_output_json_with_model_list(mock_get_api):
     make_models(models, mock_get_api)
     response = [models.Network(id='id', name='name', state='ACTIVE')]
     output = helpers.format_output(response, 'json')
     assert json.loads(output) == [{"id": "id", "name": "name", "state": "ACTIVE"}]
+
+
+@patch.object(models, 'get_api')
+def test_format_output_json_with_model(mock_get_api):
+    make_models(models, mock_get_api)
+    response = models.Network(id='id', name='name', state='ACTIVE')
+    output = helpers.format_output(response, 'json')
+    assert json.loads(output) == {"id": "id", "name": "name", "state": "ACTIVE"}
 
 
 @patch.object(models, 'get_api')

@@ -32,6 +32,6 @@ class Command(CommandBase):
         :type cloud_region_id: str
 
         :returns: a cloud region object
-        :rtype: dict
+        :rtype: CloudRegion
         """
-        return self.__call__('get', '/cloudRegions/{}'.format(cloud_region_id))
+        return self.client.get_cloud_region(cloud_region_id)

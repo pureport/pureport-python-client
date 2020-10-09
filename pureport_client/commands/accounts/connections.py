@@ -22,4 +22,4 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of connection objects
         :rtype: list
         """
-        return self.__call__('get', 'connections')
+        return self.client.find_connections()

@@ -26,7 +26,8 @@ class Command(AccountsMixin, CommandBase):
 
         \f
         """
-        return self.__call__('get', 'invoices', json=invoice_filter)
+        # return self.__call__('get', 'invoices', json=invoice_filter)
+        return self.client.list_invoices_for_account(invoice_filter)
 
     def list_upcoming(self):
         """List all upcoming invoices for an account.
@@ -35,4 +36,4 @@ class Command(AccountsMixin, CommandBase):
         :returns: a list of NetworkInvoice objects
         :rtype: list
         """
-        return self.__call__('get', 'invoices/upcoming')
+        return self.client.list_upcoming_invoices_for_account()

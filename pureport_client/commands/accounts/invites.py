@@ -38,9 +38,9 @@ class Command(AccountsMixin, CommandBase):
         :type invite_id: str
 
         :returns: an AccountInvite object
-        :rtype: dict
+        :rtype: AccountInvite
         """
-        return self.__call__('get', 'invites/{}'.format(invite_id))
+        return self.client.get_account_invite(invite_id)
 
     @argument('invite', type=JSON)
     def create(self, invite):

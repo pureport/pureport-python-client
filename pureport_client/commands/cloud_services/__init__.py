@@ -32,6 +32,6 @@ class Command(CommandBase):
         :type cloud_service_id: str
 
         :returns: a cloud service object
-        :rtype: dict
+        :rtype: CloudService
         """
-        return self.__call__('get', '/cloudServices/{}'.format(cloud_service_id))
+        return self.client.get_cloud_service(cloud_service_id)

@@ -37,9 +37,9 @@ class Command(AccountsMixin, CommandBase):
         :type api_key: str
 
         :returns: an APIKey object
-        :rtype: dict
+        :rtype: ApiKey
         """
-        return self.__call__('get', 'apikeys/{}'.format(api_key))
+        return self.client.get_api_key(api_key)
 
     @argument('api_key', type=JSON)
     def create(self, api_key):

@@ -1,0 +1,60 @@
+{
+  "Network": [
+    {
+      "id": "id",
+      "title": "ID",
+      "width": 35
+    },
+    {
+      "id": "name",
+      "title": "NAME",
+      "width": 25
+    },
+    {
+      "id": "state",
+      "title": "STATE",
+      "width": 25
+    },
+    {
+      "id": "tags",
+      "title": "TAGS",
+      "width": -1,
+      "json": "True"
+    }
+  ],
+  "Account": [
+    {
+      "id": "id",
+      "title": "ID",
+      "width": 35
+    },
+    {
+      "id": "name",
+      "title": "NAME",
+      "width": -1
+    }
+  ],
+  "CloudRegion": [
+    {
+      "id": "id",
+      "title": "ID",
+      "width": 25
+    },
+    {
+      "id": "provider",
+      "title": "PROVIDER",
+      "width": 20
+    },
+    {
+      "id": "display_name",
+      "title": "DISPLAY_NAME",
+      "width": 40
+    },
+    {
+      "id": "geo_coordinates",
+      "title": "GEO-COORDINATES",
+      "serialize": "True",
+      "width": -1
+    }
+  ]
+}

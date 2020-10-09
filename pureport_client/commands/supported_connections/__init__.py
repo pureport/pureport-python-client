@@ -26,6 +26,4 @@ class Command(CommandBase):
         :returns: a supported connection object
         :type: dict
         """
-        return self.__call__(
-            'get', '/supportedConnections/{}'.format(supported_connection_id)
-        )
+        return self.client.get_supported_connection(supported_connection_id)

@@ -32,6 +32,6 @@ class Command(CommandBase):
         :type location_id: str
 
         :returns: a location object
-        :rtype: dict
+        :rtype: Location
         """
-        return self.__call__('get', '/locations/{}'.format(location_id))
+        return self.client.get_location(location_id)

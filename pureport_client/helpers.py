@@ -23,7 +23,8 @@ SERVER_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 column_supported_models = [
     'Network',
-    'Account'
+    'Account',
+    'CloudRegion'
 ]
 
 
@@ -144,14 +145,15 @@ def format_output(response, response_format):
     """
     if response is not None:
         has_printed_columns = False
-        if isinstance(response, list) and len(response) > 0 and hasattr(models, type(response[0]).__name__):
-            response_type = type(response[0]).__name__
-            if response_format != 'column' or response_type not in column_supported_models:
+        # Check if the response has model obects
+        if contains_model_object(response):
+            response_type = get_response_type(response)
+            if response_type in column_supported_models and response_format == 'column':
+                return column_dumps(response, response_type)
+            elif isinstance(response, list):
                 response = [o.serialize() for o in response]
             else:
-                echo_string = column_dumps(response, response_type)
-                has_printed_columns = True
-                return echo_string
+                response = response.serialize()
 
         # fallback mode
         if response_format == 'json_pp' or (response_format == 'column' and not has_printed_columns):
@@ -160,3 +162,18 @@ def format_output(response, response_format):
             return json_dumps(response)
         elif response_format == 'yaml':
             return yaml_dumps(response)
+
+
+def contains_model_object(response):
+    if hasattr(models, type(response).__name__):
+        return True
+    if isinstance(response, list) and len(response) > 0 and hasattr(models, type(response[0]).__name__):
+        return True
+    return False
+
+
+def get_response_type(response):
+    if isinstance(response, list):
+        if len(response) > 0:
+            return type(response[0]).__name__
+    return type(response).__name__
