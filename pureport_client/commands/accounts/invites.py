@@ -14,6 +14,7 @@ from pureport_client.commands import (
 )
 
 from pureport_client.util import JSON
+from pureport import models
 
 
 class Command(AccountsMixin, CommandBase):
@@ -38,9 +39,9 @@ class Command(AccountsMixin, CommandBase):
         :type invite_id: str
 
         :returns: an AccountInvite object
-        :rtype: dict
+        :rtype: models.AccountInvite
         """
-        return self.__call__('get', 'invites/{}'.format(invite_id))
+        return self.client.get_account_invite(invite_id)
 
     @argument('invite', type=JSON)
     def create(self, invite):
@@ -51,9 +52,11 @@ class Command(AccountsMixin, CommandBase):
         :type invit: dict
 
         :returns: an AccountInvite object
-        :rtype: dict
+        :rtype: models.AccountInvite
         """
-        return self.__call__('post', 'invites', json=invite)
+        model_invite = models.load('AccountInvite', invite)
+        model_invite.account_id = self.account_id
+        return self.client.invite_account(model_invite)
 
     @argument('invite', type=JSON)
     def update(self, invite):
@@ -64,9 +67,11 @@ class Command(AccountsMixin, CommandBase):
         :type invite: dict
 
         :returns: an AccountInvite object
-        :rtype: dict
+        :rtype: models.AccountInvite
         """
-        return self.__call__('put', 'invites/{id}'.format(**invite), json=invite)
+        model_invite = models.load('AccountInvite', invite)
+        model_invite.account_id = self.account_id
+        return self.client.update_account_invite(model_invite)
 
     @argument('invite_id')
     def delete(self, invite_id):
@@ -78,4 +83,4 @@ class Command(AccountsMixin, CommandBase):
 
         :returns: None
         """
-        self.__call__('delete', 'invites/{}'.format(invite_id))
+        self.client.delete_account_invite(invite_id)
