@@ -1,4 +1,4 @@
-column_settings = {  
+column_settings = {
     'Account': [
         {'id': 'id', 'title': 'ID', 'width': 35},
         {'id': 'name', 'title': 'NAME', 'width': -1},

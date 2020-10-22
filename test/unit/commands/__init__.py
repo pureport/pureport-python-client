@@ -70,7 +70,7 @@ def request(*args, **kwargs):
     return response()
 
 
-def return_object(query=None):
+def return_object(query=None, model=None):
     return []
 
 
@@ -79,17 +79,27 @@ client.get.side_effect = request
 client.post.side_effect = request
 client.put.side_effect = request
 client.delete.side_effect = request
+client.account_id = 'account_id'
 # all client functions
 client.find_networks.side_effect = return_object
+client.add_network.side_effect = return_object
 client.find_all_accounts.side_effect = return_object
+client.create_account.side_effect = return_object
 client.find_all_roles.side_effect = return_object
 client.find_api_keys.side_effect = return_object
 client.get_api_key.side_effect = return_object
+client.create_api_key.side_effect = return_object
+client.update_api_key.side_effect = return_object
 client.find_connections.side_effect = return_object
 client.get_connections.side_effect = return_object
 client.find_account_invites.side_effect = return_object
 client.find_ports.side_effect = return_object
 client.find_all_roles.side_effect = return_object
+client.get_role.side_effect = return_object
+client.create_role.side_effect = return_object
+client.update_role.side_effect = return_object
+client.update_role.side_effect = return_object
+client.create_role.side_effect = return_object
 client.get_account_supported_connections.side_effect = return_object
 client.get_cloud_regions.side_effect = return_object
 client.get_cloud_region.side_effect = return_object
@@ -103,6 +113,9 @@ client.get_supported_ports.side_effect = return_object
 client.get_cloud_service.side_effect = return_object
 client.get_account_invite.side_effect = return_object
 client.get_supported_connection.side_effect = return_object
+client.has_consent.side_effect = return_object
+client.consent.side_effect = return_object
+client.invite_account.side_effect = return_object
 
 runner = CliRunner()
 cli = create_mock_cli(client)

@@ -20,15 +20,15 @@ class Command(AccountsMixin, CommandBase):
 
         \f
         :returns: the AccountConsent object
-        :rtype: dict
+        :rtype: models.AccountConsent
         """
-        return self.__call__('get', 'consent')
+        return self.client.has_consent()
 
     def accept(self):
         """Accept consent for the provided account.
 
         \f
         :returns: an AccountConsent object
-        :rtype: dict
+        :rtype: models.AccountConsent
         """
-        return self.__call__('post', 'consent')
+        return self.client.consent()

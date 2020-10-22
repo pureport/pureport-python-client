@@ -13,6 +13,7 @@ from pureport_client.commands import (
 )
 
 from pureport_client.util import JSON
+from pureport import models
 
 
 class Command(AccountsMixin, CommandBase):
@@ -37,6 +38,8 @@ class Command(AccountsMixin, CommandBase):
         :type network: dict
 
         :returns: an new Network object
-        :rtype: dict
+        :rtype: models.Network
         """
-        return self.__call__('post', 'networks', json=network)
+        model = models.load("Network", network)
+        model.account_id = self.account_id
+        return self.client.add_network(model=model)

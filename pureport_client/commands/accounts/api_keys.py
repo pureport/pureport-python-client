@@ -13,6 +13,7 @@ from pureport_client.commands import (
 )
 
 from pureport_client.util import JSON
+from pureport import models
 
 
 class Command(AccountsMixin, CommandBase):
@@ -37,7 +38,11 @@ class Command(AccountsMixin, CommandBase):
         :type api_key: str
 
         :returns: an APIKey object
+<<<<<<< HEAD
         :rtype: ApiKey
+=======
+        :rtype: models.ApiKey
+>>>>>>> 631bf48... Adding object model refactors for a few more command types (#66)
         """
         return self.client.get_api_key(api_key)
 
@@ -49,7 +54,9 @@ class Command(AccountsMixin, CommandBase):
         :param api_key: the key associated with the API Key to return
         :type api_key: str
         """
-        return self.__call__('post', 'apikeys', json=api_key)
+        model = models.load("ApiKey", api_key)
+        model.account_id = self.account_id
+        return self.client.create_api_key(model=model)
 
     @argument('api_key', type=JSON)
     def update(self, api_key):
@@ -59,9 +66,9 @@ class Command(AccountsMixin, CommandBase):
         :param api_key: the key associated with the API Key to return
         :type api_key: str
         """
-        return self.__call__(
-            'put', 'apikeys/{key}'.format(**api_key), json=api_key
-        )
+        model = models.load("ApiKey", api_key)
+        model.account_id = self.account_id
+        return self.client.update_api_key(model=model)
 
     @argument('api_key')
     def delete(self, api_key):
@@ -71,4 +78,4 @@ class Command(AccountsMixin, CommandBase):
         :param api_key: the key associated with the API Key to return
         :type api_key: str
         """
-        self.__call__('delete', 'apikeys/{}'.format(api_key))
+        self.client.delete_api_key(api_key)
