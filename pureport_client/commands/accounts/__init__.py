@@ -12,6 +12,7 @@ from click import (
 
 from pureport_client.util import JSON
 from pureport_client.commands import CommandBase
+from pureport import models
 
 
 class Command(CommandBase):
@@ -51,10 +52,10 @@ class Command(CommandBase):
 
         \f
         :param str account_id: the account id
-        :rtype: Account
+        :rtype: models.Account
         :raises: .exception.ClientHttpError
         """
-        self.__call__('get', '/accounts/{}'.format(account_id))
+        self.client.get_account(account_id)
 
     @argument('account', type=JSON)
     def create(self, account):
@@ -65,9 +66,11 @@ class Command(CommandBase):
         :type account: dict
 
         :returns: the created Account object
-        :rtype: dict
+        :rtype: models.Account
         """
-        return self.__call__('post', '/accounts', json=account)
+        model = models.load('Account', account)
+
+        return self.client.create_account(model=model)
 
     @argument('account', type=JSON)
     def update(self, account):
@@ -78,9 +81,10 @@ class Command(CommandBase):
         :type account: dict
 
         :returns: an updated Account object
-        :rtype: dict
+        :rtype: models.Account
         """
-        return self.__call__('put', '/accounts/{id}'.format(**account), json=account)
+        model = models.load('Account', account)
+        return self.client.update_account(model=model)
 
     @argument('account_id')
     def delete(self, account_id):
@@ -92,7 +96,7 @@ class Command(CommandBase):
 
         :returns: None
         """
-        self.__call__('delete', '/accounts/{}'.format(account_id))
+        self.client.delete_account(account_id)
 
     @option('-a', '--account_id', envvar='PUREPORT_ACCOUNT_ID', required=True)
     def api_keys(self, account_id):

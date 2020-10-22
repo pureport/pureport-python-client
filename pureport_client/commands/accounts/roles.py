@@ -13,6 +13,7 @@ from pureport_client.commands import (
 )
 
 from pureport_client.util import JSON
+from pureport import models
 
 
 class Command(AccountsMixin, CommandBase):
@@ -37,9 +38,9 @@ class Command(AccountsMixin, CommandBase):
         :type role_id: str
 
         :returns: an AccountRole object
-        :rtype: dict
+        :rtype: models.Role
         """
-        return self.__call__('get', 'roles/{}'.format(role_id))
+        return self.client.get_role(role_id)
 
     @argument('role', type=JSON)
     def create(self, role):
@@ -50,9 +51,12 @@ class Command(AccountsMixin, CommandBase):
         :type role: dict
 
         :returns: a created AccountRole object
-        :rtype: dickt
+        :rtype: models.Role
         """
-        return self.__call__('post', 'roles', json=role)
+        model = models.load('Role', role)
+        model.account_id = self.account_id
+
+        return self.client.create_role(model)
 
     @argument('role', type=JSON)
     def update(self, role):
@@ -63,9 +67,12 @@ class Command(AccountsMixin, CommandBase):
         :type role: dict
 
         :returns: an updated AccountRole object
-        :rtype: dickt
+        :rtype: models.Role
         """
-        return self.__call__('put', 'roles/{id}'.format(**role), json=role)
+        model = models.load('Role', role)
+        model.account_id = self.account_id
+
+        return self.client.update_role(model)
 
     @argument('role_id')
     def delete(self, role_id):
@@ -77,4 +84,4 @@ class Command(AccountsMixin, CommandBase):
 
         :returns: None
         """
-        self.__call__('delete', 'roles/{}'.format(role_id))
+        self.client.delete_role(role_id)
