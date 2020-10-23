@@ -4,7 +4,7 @@
 # All Rights Reserved
 import json
 
-column_settings = json.loads(open('column_settings.json').read())
+from pureport_client.column_settings import column_settings
 
 
 def print_columns(response, response_type):

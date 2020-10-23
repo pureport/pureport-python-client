@@ -18,14 +18,9 @@ from datetime import (
 )
 
 from pureport import models
+from pureport_client.column_settings import column_settings
 
 SERVER_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
-
-column_supported_models = [
-    'Network',
-    'Account',
-    'CloudRegion'
-]
 
 
 def format_date(value):
@@ -148,7 +143,7 @@ def format_output(response, response_format):
         # Check if the response has model obects
         if contains_model_object(response):
             response_type = get_response_type(response)
-            if response_type in column_supported_models and response_format == 'column':
+            if response_type in column_settings.keys() and response_format == 'column':
                 return column_dumps(response, response_type)
             elif isinstance(response, list):
                 response = [o.serialize() for o in response]
