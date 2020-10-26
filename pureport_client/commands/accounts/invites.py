@@ -39,11 +39,7 @@ class Command(AccountsMixin, CommandBase):
         :type invite_id: str
 
         :returns: an AccountInvite object
-<<<<<<< HEAD
-        :rtype: AccountInvite
-=======
         :rtype: models.AccountInvite
->>>>>>> 631bf48... Adding object model refactors for a few more command types (#66)
         """
         return self.client.get_account_invite(invite_id)
 

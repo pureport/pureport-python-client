@@ -38,11 +38,7 @@ class Command(AccountsMixin, CommandBase):
         :type api_key: str
 
         :returns: an APIKey object
-<<<<<<< HEAD
-        :rtype: ApiKey
-=======
         :rtype: models.ApiKey
->>>>>>> 631bf48... Adding object model refactors for a few more command types (#66)
         """
         return self.client.get_api_key(api_key)
 
