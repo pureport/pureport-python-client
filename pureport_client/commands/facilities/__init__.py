@@ -32,6 +32,6 @@ class Command(CommandBase):
         :type facility_id: str
 
         :returns: a facility object
-        :rtype: dict
+        :rtype: Facility
         """
-        return self.__call__('get', '/facilities/{}'.format(facility_id))
+        return self.client.get_facility(facility_id)

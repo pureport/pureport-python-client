@@ -29,4 +29,4 @@ class Command(AccountsMixin, CommandBase):
         :rtype: list
         """
         kwargs = {'query': {'facility': facility_id}}
-        return self.__call__('get', 'supportedPorts', **kwargs)
+        return self.client.get_supported_ports(**kwargs)

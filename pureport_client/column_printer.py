@@ -4,19 +4,7 @@
 # All Rights Reserved
 import json
 
-# Defining the Titles and Widths of the columns for the supported response types
-# TODO move these into a config file separate from the code
-network_list_column_values = [
-    {'id': 'id', 'title': 'ID', 'width': 35},
-    {'id': 'name', 'title': 'NAME', 'width': 25},
-    {'id': 'state', 'title': 'STATE', 'width': 25},
-    {'id': 'tags', 'title': 'TAGS', 'width': -1, 'json': True}
-]
-
-account_list_column_values = [
-    {'id': 'id', 'title': 'ID', 'width': 35},
-    {'id': 'name', 'title': 'NAME', 'width': -1},
-]
+from pureport_client.column_settings import column_settings
 
 
 def print_columns(response, response_type):
@@ -38,28 +26,41 @@ def print_columns(response, response_type):
         formatted_title = title.ljust(column['width']) if column['width'] != -1 else title + '\n'
         return_string += formatted_title
 
-    # print each row
-    for row in response:
-        for column in column_values:
-            value = ''
-            column_width = column['width']
-            if hasattr(row, column['id']):
-                value = getattr(row, column['id'])
-                if 'json' in column:
-                    if value is not None:
-                        value = json.dumps(value)
-                    else:
-                        value = ''
-            formatted_string = value.ljust(column_width) if column_width != -1 else value + '\n'
+    if (isinstance(response, list)):
+        for row in response:
+            return_string += print_row(row, column_values)
+    else:
+        return_string += print_row(response, column_values)
 
-            return_string += formatted_string
     return return_string
 
 
-def pick_list(response_type):
-    if response_type == 'Network':
-        return network_list_column_values
-    elif response_type == 'Account':
-        return account_list_column_values
+def print_row(row, column_values):
+    row_string = ''
+    for column in column_values:
+        value = ''
+        column_width = column['width']
+        if hasattr(row, column['id']):
+            value = getattr(row, column['id'])
+            if 'json' in column:
+                if value is not None:
+                    value = json.dumps(value)
+                else:
+                    value = ''
+            elif 'serialize' in column:
+                if value is not None:
+                    value = json.dumps(value.serialize())
+                else:
+                    value = ''
 
-    return []
+        formatted_string = value.ljust(column_width) if column_width != -1 else value + '\n'
+
+        row_string += formatted_string
+    return row_string
+
+
+def pick_list(response_type):
+    if response_type in column_settings.keys():
+        return column_settings[response_type]
+    else:
+        return []
